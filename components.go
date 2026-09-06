@@ -54,6 +54,7 @@ type News struct {
 	Title     string `json:"title"`
 	URL       string `json:"url"`
 	Published string `json:"published"`
+	Summary   string `json:"summary"`
 }
 
 // Attendance represents a attendance.

@@ -22,7 +22,7 @@ type Forecast = {
   rain: number;
 };
 type Event = { id: string; title: string; time: string; location: string; allDay: boolean };
-type News = { title: string; url: string; published: string };
+type News = { title: string; url: string; published: string; summary: string };
 type Attendance = {
   available: boolean;
   state: string;
@@ -126,7 +126,7 @@ export function Signage() {
       if (!data().news.length) return;
       setNewsTakeover(true);
       clearTimeout(dismissNews);
-      dismissNews = window.setTimeout(() => setNewsTakeover(false), 18 * 1000);
+      dismissNews = window.setTimeout(() => setNewsTakeover(false), 24 * 1000);
     };
     const firstNews = window.setTimeout(showNews, 30 * 1000);
     const newsCycle = window.setInterval(showNews, 3 * 60 * 1000);
@@ -363,13 +363,14 @@ export function Signage() {
           </div>
           <ol>
             {data()
-              .news.slice(0, 4)
+              .news.slice(0, 3)
               .map((item, index) => (
                 <li key={item.url}>
                   <b>{String(index + 1).padStart(2, "0")}</b>
                   <div>
                     <time>{item.published || "--:--"}</time>
                     <strong>{item.title}</strong>
+                    <p>{item.summary}</p>
                   </div>
                 </li>
               ))}

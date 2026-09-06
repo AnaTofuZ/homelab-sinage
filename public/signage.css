@@ -501,7 +501,7 @@ button {
     linear-gradient(rgba(215, 255, 63, 0.06) 1px, transparent 1px), #090b0d;
   background-size: 54px 54px;
   pointer-events: none;
-  animation: news-takeover 18s both;
+  animation: news-takeover 24s both;
 }
 .news-takeover::after {
   content: "NEWS";
@@ -561,6 +561,8 @@ button {
 }
 .news-takeover ol {
   z-index: 1;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
   min-height: 0;
   margin: 0;
   padding: 0;
@@ -570,7 +572,7 @@ button {
 .news-takeover li {
   display: grid;
   grid-template-columns: 72px 1fr;
-  min-height: 74px;
+  min-height: 0;
   border-bottom: 1px solid #3a3f42;
   animation: news-row 0.55s both;
 }
@@ -579,9 +581,6 @@ button {
 }
 .news-takeover li:nth-child(3) {
   animation-delay: 0.2s;
-}
-.news-takeover li:nth-child(4) {
-  animation-delay: 0.3s;
 }
 .news-takeover li > b {
   display: grid;
@@ -594,8 +593,9 @@ button {
 }
 .news-takeover li > div {
   display: grid;
-  grid-template-columns: 62px 1fr;
+  grid-template-columns: 62px minmax(280px, 0.85fr) 1.15fr;
   align-items: center;
+  gap: 18px;
   min-width: 0;
   padding: 10px 18px;
 }
@@ -606,12 +606,23 @@ button {
     monospace;
 }
 .news-takeover li strong {
+  display: -webkit-box;
   overflow: hidden;
-  font-size: clamp(15px, 2.1vw, 25px);
+  font-size: clamp(15px, 1.8vw, 23px);
   font-weight: 500;
   line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.news-takeover li p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: #b9bec0;
+  font-size: clamp(11px, 1.25vw, 16px);
+  line-height: 1.65;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 .news-takeover > footer span {
   color: var(--acid);
@@ -751,7 +762,13 @@ button {
     grid-template-columns: 52px 1fr;
   }
   .news-takeover li > div {
-    grid-template-columns: 52px 1fr;
+    grid-template-columns: 46px 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 4px 10px;
     padding-inline: 12px;
+  }
+  .news-takeover li p {
+    grid-column: 1 / -1;
+    -webkit-line-clamp: 2;
   }
 }

@@ -61,6 +61,7 @@ type newsItem struct {
 	Title     string `json:"title"`
 	URL       string `json:"url"`
 	Published string `json:"published"`
+	Summary   string `json:"summary"`
 }
 
 type attendanceStatus struct {
@@ -163,7 +164,7 @@ func (s *dashboardService) fetchWeather(ctx context.Context) (weatherData, []for
 func (s *dashboardService) fetchNews(ctx context.Context) ([]newsItem, error) {
 	endpoint := os.Getenv("NEWS_FEED_URL")
 	if endpoint == "" {
-		endpoint = "https://www3.nhk.or.jp/rss/news/cat0.xml"
+		endpoint = "https://news.web.nhk/n-data/conf/na/rss/cat0.xml"
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
@@ -180,9 +181,10 @@ func (s *dashboardService) fetchNews(ctx context.Context) ([]newsItem, error) {
 	var feed struct {
 		Channel struct {
 			Items []struct {
-				Title   string `xml:"title"`
-				Link    string `xml:"link"`
-				PubDate string `xml:"pubDate"`
+				Title       string `xml:"title"`
+				Link        string `xml:"link"`
+				Description string `xml:"description"`
+				PubDate     string `xml:"pubDate"`
 			} `xml:"item"`
 		} `xml:"channel"`
 	}
@@ -195,7 +197,12 @@ func (s *dashboardService) fetchNews(ctx context.Context) ([]newsItem, error) {
 		if parsed, err := time.Parse(time.RFC1123Z, item.PubDate); err == nil {
 			published = parsed.In(tokyo).Format("15:04")
 		}
-		items = append(items, newsItem{strings.TrimSpace(item.Title), strings.TrimSpace(item.Link), published})
+		items = append(items, newsItem{
+			Title:     strings.TrimSpace(item.Title),
+			URL:       strings.TrimSpace(item.Link),
+			Published: published,
+			Summary:   strings.TrimSpace(item.Description),
+		})
 		if len(items) == 10 {
 			break
 		}
