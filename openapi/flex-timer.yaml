@@ -20,7 +20,6 @@ paths:
     post:
       operationId: recordAction
       summary: 現在時刻で出退勤または休憩を記録する
-      security: [{ bearerAuth: [] }]
       parameters:
         - name: action
           in: path
@@ -37,8 +36,6 @@ paths:
         "409":
           description: 現在の状態では実行できない操作
 components:
-  securitySchemes:
-    bearerAuth: { type: http, scheme: bearer }
   schemas:
     Status:
       type: object
