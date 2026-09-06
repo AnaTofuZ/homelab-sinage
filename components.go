@@ -40,6 +40,24 @@ type Forecast struct {
 	Rain      int    `json:"rain"`
 }
 
+// HourlyWeather represents a hourlyweather.
+type HourlyWeather struct {
+	Time        string `json:"time"`
+	Code        int    `json:"code"`
+	Condition   string `json:"condition"`
+	Temperature int    `json:"temperature"`
+	Rain        int    `json:"rain"`
+	Precip      int    `json:"precip"`
+	Wind        int    `json:"wind"`
+}
+
+// WeatherAlert represents a weatheralert.
+type WeatherAlert struct {
+	Level  string `json:"level"`
+	Title  string `json:"title"`
+	Detail string `json:"detail"`
+}
+
 // Event represents a event.
 type Event struct {
 	ID       string `json:"id"`
@@ -70,13 +88,15 @@ type Attendance struct {
 
 // Dashboard represents a dashboard.
 type Dashboard struct {
-	GeneratedAt string     `json:"generatedAt"`
-	Weather     Weather    `json:"weather"`
-	Forecast    []Forecast `json:"forecast"`
-	Events      []Event    `json:"events"`
-	News        []News     `json:"news"`
-	Attendance  Attendance `json:"attendance"`
-	Warnings    []string   `json:"warnings"`
+	GeneratedAt string          `json:"generatedAt"`
+	Weather     Weather         `json:"weather"`
+	Hourly      []HourlyWeather `json:"hourly"`
+	Alerts      []WeatherAlert  `json:"alerts"`
+	Forecast    []Forecast      `json:"forecast"`
+	Events      []Event         `json:"events"`
+	News        []News          `json:"news"`
+	Attendance  Attendance      `json:"attendance"`
+	Warnings    []string        `json:"warnings"`
 }
 
 // SignageInput is the user-facing input type.
