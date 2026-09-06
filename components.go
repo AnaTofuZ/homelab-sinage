@@ -19,86 +19,86 @@ func randomID(n int) string {
 
 // Weather represents a weather.
 type Weather struct {
-	Place string `json:"place"`
-	Temperature int `json:"temperature"`
-	Apparent int `json:"apparent"`
-	Code int `json:"code"`
-	Condition string `json:"condition"`
-	High int `json:"high"`
-	Low int `json:"low"`
-	Rain int `json:"rain"`
+	Place       string `json:"place"`
+	Temperature int    `json:"temperature"`
+	Apparent    int    `json:"apparent"`
+	Code        int    `json:"code"`
+	Condition   string `json:"condition"`
+	High        int    `json:"high"`
+	Low         int    `json:"low"`
+	Rain        int    `json:"rain"`
 }
 
 // Forecast represents a forecast.
 type Forecast struct {
-	Date string `json:"date"`
-	Weekday string `json:"weekday"`
-	Code int `json:"code"`
+	Date      string `json:"date"`
+	Weekday   string `json:"weekday"`
+	Code      int    `json:"code"`
 	Condition string `json:"condition"`
-	High int `json:"high"`
-	Low int `json:"low"`
-	Rain int `json:"rain"`
+	High      int    `json:"high"`
+	Low       int    `json:"low"`
+	Rain      int    `json:"rain"`
 }
 
 // Event represents a event.
 type Event struct {
-	ID string `json:"id"`
-	Title string `json:"title"`
-	Time string `json:"time"`
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Time     string `json:"time"`
 	Location string `json:"location"`
-	AllDay bool `json:"allDay"`
+	AllDay   bool   `json:"allDay"`
 }
 
 // News represents a news.
 type News struct {
-	Title string `json:"title"`
-	URL string `json:"url"`
+	Title     string `json:"title"`
+	URL       string `json:"url"`
 	Published string `json:"published"`
 }
 
 // Attendance represents a attendance.
 type Attendance struct {
-	Available bool `json:"available"`
-	State string `json:"state"`
-	WorkedSeconds int `json:"workedSeconds"`
-	TargetSeconds int `json:"targetSeconds"`
-	DayDifference int `json:"dayDifference"`
-	MonthDifference int `json:"monthDifference"`
-	ProjectedSeconds int `json:"projectedSeconds"`
+	Available        bool   `json:"available"`
+	State            string `json:"state"`
+	WorkedSeconds    int    `json:"workedSeconds"`
+	TargetSeconds    int    `json:"targetSeconds"`
+	DayDifference    int    `json:"dayDifference"`
+	MonthDifference  int    `json:"monthDifference"`
+	ProjectedSeconds int    `json:"projectedSeconds"`
 }
 
 // Dashboard represents a dashboard.
 type Dashboard struct {
-	GeneratedAt string `json:"generatedAt"`
-	Weather Weather `json:"weather"`
-	Forecast []Forecast `json:"forecast"`
-	Events []Event `json:"events"`
-	News []News `json:"news"`
-	Attendance Attendance `json:"attendance"`
-	Warnings []string `json:"warnings"`
+	GeneratedAt string     `json:"generatedAt"`
+	Weather     Weather    `json:"weather"`
+	Forecast    []Forecast `json:"forecast"`
+	Events      []Event    `json:"events"`
+	News        []News     `json:"news"`
+	Attendance  Attendance `json:"attendance"`
+	Warnings    []string   `json:"warnings"`
 }
 
 // SignageInput is the user-facing input type.
 type SignageInput struct {
-	ScopeID string // Optional: if empty, random ID is generated
+	ScopeID  string // Optional: if empty, random ID is generated
 	BfParent string // Optional: parent scope id
-	BfMount string // Optional: slot id in parent
+	BfMount  string // Optional: slot id in parent
 }
 
 // SignageProps is the props type for the Signage component.
 type SignageProps struct {
-	ScopeID string `json:"-"`
-	BfIsRoot bool `json:"-"`
-	BfIsChild bool `json:"-"`
-	BfParent string `json:"-"`
-	BfMount string `json:"-"`
-	BfDataKey string `json:"-"`
-	Scripts *bf.ScriptCollector `json:"-"`
+	ScopeID       string                 `json:"-"`
+	BfIsRoot      bool                   `json:"-"`
+	BfIsChild     bool                   `json:"-"`
+	BfParent      string                 `json:"-"`
+	BfMount       string                 `json:"-"`
+	BfDataKey     string                 `json:"-"`
+	Scripts       *bf.ScriptCollector    `json:"-"`
 	BfCallerProps map[string]interface{} `json:"-"`
-	Data Dashboard `json:"-"`
-	Now interface{} `json:"-"`
-	Busy bool `json:"-"`
-	Error string `json:"-"`
+	Data          Dashboard              `json:"-"`
+	Now           interface{}            `json:"-"`
+	Busy          bool                   `json:"-"`
+	Error         string                 `json:"-"`
 }
 
 // NewSignageProps creates SignageProps from SignageInput.
@@ -111,13 +111,13 @@ func NewSignageProps(in SignageInput) SignageProps {
 	bfCallerProps := map[string]interface{}{}
 
 	return SignageProps{
-		ScopeID: scopeID,
-		BfParent: in.BfParent,
-		BfMount: in.BfMount,
+		ScopeID:       scopeID,
+		BfParent:      in.BfParent,
+		BfMount:       in.BfMount,
 		BfCallerProps: bfCallerProps,
-		Data: Dashboard{},
-		Now: nil,
-		Busy: false,
-		Error: "",
+		Data:          Dashboard{},
+		Now:           nil,
+		Busy:          false,
+		Error:         "",
 	}
 }

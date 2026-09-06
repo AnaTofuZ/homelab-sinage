@@ -43,6 +43,8 @@ npm run format
 npm run check
 ```
 
+Forgejo ActionsではTypeScript/HTMLをNode.js、Goをsetup-goとgolangci-lintで直接検査します。Nix環境はNix式の検査と `npmDepsHash` / `vendorHash` の自動更新だけに使用します。mainへのpush時は `DEPLOY_SSH_KEY` が設定済みなら `homelab-signage-deploy@192.168.10.11` を呼び出します。
+
 Tab M8 は Chrome の「ホーム画面に追加」またはキオスクブラウザで横向き表示を想定しています。縦向きレイアウトと `prefers-reduced-motion` にも対応しています。
 
 A [BarefootJS](https://barefootjs.dev) app scaffolded with the **net/http (Go standard library, html/template SSR)** adapter.

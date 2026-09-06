@@ -10,10 +10,11 @@
     "format:check": "oxfmt --check components vite.config.ts tsconfig.json package.json public/signage.css layout.html",
     "lint": "oxlint --deny-warnings components vite.config.ts",
     "lint:go": "golangci-lint run ./...",
+    "typecheck": "tsc --noEmit",
     "start": "go run .",
     "watch": "vite build --watch",
     "test": "go test ./...",
-    "check": "npm run format:check && npm run lint && npm run lint:go && npm test && npm run build"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run lint:go && npm test && npm run build"
   },
   "dependencies": {
     "@barefootjs/client": "^0.34.0",

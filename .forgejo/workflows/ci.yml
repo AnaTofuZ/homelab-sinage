@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  code:
+    runs-on: docker
+    timeout-minutes: 20
+    steps:
+      - uses: https://data.forgejo.org/actions/checkout@v6
+      - uses: https://data.forgejo.org/actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: https://data.forgejo.org/actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - name: Verify generated BarefootJS component
+        run: |
+          npm run build:ui
+          gofmt -w components.go
+          git diff --exit-code -- components.go
+      - name: Check Go formatting
+        run: test -z "$(gofmt -l $(git ls-files '*.go'))"
+      - uses: https://data.forgejo.org/golangci/golangci-lint-action@v9
+        with:
+          version: v2.12.2
+      - run: go test -race ./...
+
+  nix:
+    runs-on: docker
+    timeout-minutes: 20
+    steps:
+      - uses: https://data.forgejo.org/actions/checkout@v6
+      - name: Install sudo
+        run: |
+          apt-get update
+          apt-get install --yes sudo
+      - uses: https://github.com/cachix/install-nix-action@v31
+      - run: nix fmt -- --ci
+      - run: nix run nixpkgs#statix -- check .
+      - run: nix flake check --no-build --all-systems
+
+  deploy:
+    needs: [code, nix]
+    if: forgejo.event_name == 'push'
+    runs-on: docker
+    timeout-minutes: 10
+    steps:
+      - name: Deploy current master
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then
+            echo "DEPLOY_SSH_KEY is not configured; skipping deployment."
+            exit 0
+          fi
+          install -d -m 0700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/deploy"
+          chmod 0600 "$HOME/.ssh/deploy"
+          printf '%s\n' '192.168.10.11 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILTMnlpZIxJ2osrYao9x6uwuel/cCZn5tnB5w5VVCV4/' > "$HOME/.ssh/known_hosts"
+          ssh -i "$HOME/.ssh/deploy" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            homelab-signage-deploy@192.168.10.11
