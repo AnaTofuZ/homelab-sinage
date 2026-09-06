@@ -832,6 +832,15 @@ button {
   .weather-now {
     padding-inline: 14px;
   }
+  .weather-now > div {
+    gap: 8px;
+  }
+  .weather-now > div > strong {
+    font-size: 36px;
+  }
+  .temperature {
+    font-size: 34px;
+  }
   .hourly-weather {
     padding-inline: 12px;
   }
