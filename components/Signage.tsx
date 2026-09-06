@@ -90,6 +90,7 @@ export function Signage() {
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
   const [newsTakeover, setNewsTakeover] = createSignal(false);
+  const [newsPage, setNewsPage] = createSignal(0);
 
   const reload = async () => {
     try {
@@ -126,7 +127,11 @@ export function Signage() {
       if (!data().news.length) return;
       setNewsTakeover(true);
       clearTimeout(dismissNews);
-      dismissNews = window.setTimeout(() => setNewsTakeover(false), 24 * 1000);
+      dismissNews = window.setTimeout(() => {
+        setNewsTakeover(false);
+        const pages = Math.ceil(data().news.length / 3);
+        setNewsPage(pages ? (newsPage() + 1) % pages : 0);
+      }, 24 * 1000);
     };
     const firstNews = window.setTimeout(showNews, 30 * 1000);
     const newsCycle = window.setInterval(showNews, 3 * 60 * 1000);
@@ -146,6 +151,7 @@ export function Signage() {
     (data().attendance.state === "working"
       ? Math.max(0, (Date.now() - Date.parse(data().generatedAt)) / 1000)
       : 0);
+  const newsPageStart = () => (newsPage() % Math.ceil(data().news.length / 3)) * 3;
 
   return (
     <main className="signage">
@@ -363,10 +369,10 @@ export function Signage() {
           </div>
           <ol>
             {data()
-              .news.slice(0, 3)
+              .news.slice(newsPageStart(), newsPageStart() + 3)
               .map((item, index) => (
                 <li key={item.url}>
-                  <b>{String(index + 1).padStart(2, "0")}</b>
+                  <b>{String(newsPageStart() + index + 1).padStart(2, "0")}</b>
                   <div>
                     <time>{item.published || "--:--"}</time>
                     <strong>{item.title}</strong>
@@ -376,7 +382,11 @@ export function Signage() {
               ))}
           </ol>
           <footer>
-            <span>更新 {data().generatedAt.slice(11, 16)}</span>
+            <span>
+              {String(newsPageStart() / 3 + 1).padStart(2, "0")} /{" "}
+              {String(Math.ceil(data().news.length / 3)).padStart(2, "0")} · 更新{" "}
+              {data().generatedAt.slice(11, 16)}
+            </span>
             <p>このあと通常画面へ戻ります</p>
           </footer>
         </section>
