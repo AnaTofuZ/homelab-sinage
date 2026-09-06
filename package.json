@@ -1,0 +1,34 @@
+{
+  "name": "homelab-signage",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite build && concurrently -k -n dev,server -c blue,green \"vite dev\" \"go run .\"",
+    "build": "npm run build:ui",
+    "build:ui": "vite build",
+    "format": "oxfmt components vite.config.ts tsconfig.json package.json public/signage.css layout.html",
+    "format:check": "oxfmt --check components vite.config.ts tsconfig.json package.json public/signage.css layout.html",
+    "lint": "oxlint --deny-warnings components vite.config.ts",
+    "lint:go": "golangci-lint run ./...",
+    "start": "go run .",
+    "watch": "vite build --watch",
+    "test": "go test ./...",
+    "check": "npm run format:check && npm run lint && npm run lint:go && npm test && npm run build"
+  },
+  "dependencies": {
+    "@barefootjs/client": "^0.34.0",
+    "@barefootjs/go-template": "^0.34.0",
+    "@barefootjs/jsx": "^0.34.0",
+    "@barefootjs/shared": "^0.34.0"
+  },
+  "devDependencies": {
+    "@barefootjs/cli": "^0.34.0",
+    "@barefootjs/vite": "^0.34.0",
+    "@types/node": "^22.0.0",
+    "concurrently": "^9.0.0",
+    "oxfmt": "^0.66.0",
+    "oxlint": "^1.81.0",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0"
+  }
+}

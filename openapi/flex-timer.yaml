@@ -1,0 +1,53 @@
+openapi: 3.1.0
+info:
+  title: Flex Timer LAN API
+  version: 1.0.0
+  description: Home Signal が利用する、実装言語に依存しない最小の勤怠 API。
+servers:
+  - url: http://flex-timer.home
+paths:
+  /v1/status:
+    get:
+      operationId: getStatus
+      summary: 現在の勤務状態と日次・月次集計を返す
+      responses:
+        "200":
+          description: Current status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Status" }
+  /v1/actions/{action}:
+    post:
+      operationId: recordAction
+      summary: 現在時刻で出退勤または休憩を記録する
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [clock-in, clock-out, break-start, break-end]
+      responses:
+        "200":
+          description: Updated status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Status" }
+        "409":
+          description: 現在の状態では実行できない操作
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }
+  schemas:
+    Status:
+      type: object
+      required: [available, state, workedSeconds, targetSeconds, dayDifference, monthDifference, projectedSeconds]
+      properties:
+        available: { type: boolean, const: true }
+        state: { type: string, enum: [off, working, break] }
+        workedSeconds: { type: integer, format: int64, minimum: 0, description: レスポンス生成時点の当日実働秒数 }
+        targetSeconds: { type: integer, format: int64, minimum: 0, description: 一日の標準労働秒数 }
+        dayDifference: { type: integer, format: int64, description: workedSeconds - targetSeconds }
+        monthDifference: { type: integer, format: int64, description: 当月の経過営業日に対する実績差分秒数 }
+        projectedSeconds: { type: integer, format: int64, minimum: 0, description: 現在ペースによる月末予測労働秒数 }
