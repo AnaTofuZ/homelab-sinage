@@ -1,7 +1,7 @@
 {
   description = "Home Signal — Go + BarefootJS household signage";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs =
     { self, nixpkgs, ... }:
@@ -34,7 +34,7 @@
             pname = "homelab-signage-ui";
             version = "0.1.0";
             inherit src;
-            npmDepsHash = "sha256-aEN5gRRu7uhoBMqdFeZ3B8hfbIdlFVhw0AIFv9UNJ0E=";
+            npmDepsHash = "sha256-BEeyo3NMtjE1kWRBrnTthehkl9BsIqvp03xPtQTJiWA=";
             npmBuildScript = "build:ui";
             doCheck = true;
             checkPhase = ''
@@ -48,7 +48,7 @@
           };
         in
         {
-          default = pkgs.buildGoModule {
+          default = pkgs.buildGo127Module {
             pname = "homelab-signage";
             version = "0.1.0";
             inherit src;
@@ -90,10 +90,15 @@
         {
           default = pkgs.mkShell {
             packages = [
-              pkgs.go
+              pkgs.go_1_27
               pkgs.golangci-lint
               pkgs.nodejs_22
             ];
+            shellHook = ''
+              unset GOROOT
+              export GOCACHE="$PWD/.cache/go-build"
+              export GOLANGCI_LINT_CACHE="$PWD/.cache/golangci-lint"
+            '';
           };
         }
       );

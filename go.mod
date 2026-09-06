@@ -1,6 +1,6 @@
 module git.home.anatofuz.net/anatofuz/homelab-signage
 
-go 1.23.0
+go 1.27.0
 
 require (
 	github.com/barefootjs/runtime/bf v0.0.0
