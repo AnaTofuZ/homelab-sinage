@@ -101,7 +101,6 @@ type SignageProps struct {
 	Busy          bool                   `json:"-"`
 	Error         string                 `json:"-"`
 	NewsTakeover  bool                   `json:"-"`
-	NewsIndex     int                    `json:"-"`
 }
 
 // NewSignageProps creates SignageProps from SignageInput.
@@ -123,6 +122,5 @@ func NewSignageProps(in SignageInput) SignageProps {
 		Busy:          false,
 		Error:         "",
 		NewsTakeover:  false,
-		NewsIndex:     0,
 	}
 }
