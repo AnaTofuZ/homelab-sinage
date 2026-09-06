@@ -54,6 +54,7 @@ type News struct {
 	Title     string `json:"title"`
 	URL       string `json:"url"`
 	Published string `json:"published"`
+	Summary   string `json:"summary"`
 }
 
 // Attendance represents a attendance.
@@ -99,6 +100,8 @@ type SignageProps struct {
 	Now           interface{}            `json:"-"`
 	Busy          bool                   `json:"-"`
 	Error         string                 `json:"-"`
+	NewsTakeover  bool                   `json:"-"`
+	NewsPage      int                    `json:"-"`
 }
 
 // NewSignageProps creates SignageProps from SignageInput.
@@ -119,5 +122,7 @@ func NewSignageProps(in SignageInput) SignageProps {
 		Now:           nil,
 		Busy:          false,
 		Error:         "",
+		NewsTakeover:  false,
+		NewsPage:      0,
 	}
 }

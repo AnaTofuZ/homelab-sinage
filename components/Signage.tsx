@@ -22,7 +22,7 @@ type Forecast = {
   rain: number;
 };
 type Event = { id: string; title: string; time: string; location: string; allDay: boolean };
-type News = { title: string; url: string; published: string };
+type News = { title: string; url: string; published: string; summary: string };
 type Attendance = {
   available: boolean;
   state: string;
@@ -89,6 +89,8 @@ export function Signage() {
   const [now, setNow] = createSignal(new Date());
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
+  const [newsTakeover, setNewsTakeover] = createSignal(false);
+  const [newsPage, setNewsPage] = createSignal(0);
 
   const reload = async () => {
     try {
@@ -120,9 +122,25 @@ export function Signage() {
     void reload();
     const clock = window.setInterval(() => setNow(new Date()), 1000);
     const refresh = window.setInterval(() => void reload(), 5 * 60 * 1000);
+    let dismissNews = 0;
+    const showNews = () => {
+      if (!data().news.length) return;
+      setNewsTakeover(true);
+      clearTimeout(dismissNews);
+      dismissNews = window.setTimeout(() => {
+        setNewsTakeover(false);
+        const pages = Math.ceil(data().news.length / 3);
+        setNewsPage(pages ? (newsPage() + 1) % pages : 0);
+      }, 24 * 1000);
+    };
+    const firstNews = window.setTimeout(showNews, 30 * 1000);
+    const newsCycle = window.setInterval(showNews, 3 * 60 * 1000);
     onCleanup(() => {
       clearInterval(clock);
       clearInterval(refresh);
+      clearInterval(newsCycle);
+      clearTimeout(firstNews);
+      clearTimeout(dismissNews);
     });
   });
 
@@ -133,6 +151,7 @@ export function Signage() {
     (data().attendance.state === "working"
       ? Math.max(0, (Date.now() - Date.parse(data().generatedAt)) / 1000)
       : 0);
+  const newsPageStart = () => (newsPage() % Math.ceil(data().news.length / 3)) * 3;
 
   return (
     <main className="signage">
@@ -328,6 +347,50 @@ export function Signage() {
           {/* @client */ now().toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}
         </p>
       </footer>
+
+      {newsTakeover() && data().news.length > 0 && (
+        <section className="news-takeover" role="status" aria-label="ニュース">
+          <header>
+            <p>
+              <i /> HOME SIGNAL / NEWS
+            </p>
+            <time>
+              {
+                /* @client */ now().toLocaleTimeString("ja-JP", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              }
+            </time>
+          </header>
+          <div className="news-takeover-title">
+            <p>INFORMATION DISPLAY · KOFU</p>
+            <h2>ニュース</h2>
+          </div>
+          <ol>
+            {data()
+              .news.slice(newsPageStart(), newsPageStart() + 3)
+              .map((item, index) => (
+                <li key={item.url}>
+                  <b>{String(newsPageStart() + index + 1).padStart(2, "0")}</b>
+                  <div>
+                    <time>{item.published || "--:--"}</time>
+                    <strong>{item.title}</strong>
+                    <p>{item.summary}</p>
+                  </div>
+                </li>
+              ))}
+          </ol>
+          <footer>
+            <span>
+              {String(newsPageStart() / 3 + 1).padStart(2, "0")} /{" "}
+              {String(Math.ceil(data().news.length / 3)).padStart(2, "0")} · 更新{" "}
+              {data().generatedAt.slice(11, 16)}
+            </span>
+            <p>このあと通常画面へ戻ります</p>
+          </footer>
+        </section>
+      )}
     </main>
   );
 }
