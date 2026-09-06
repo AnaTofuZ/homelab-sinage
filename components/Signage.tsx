@@ -90,6 +90,7 @@ export function Signage() {
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
   const [newsTakeover, setNewsTakeover] = createSignal(false);
+  const [newsIndex, setNewsIndex] = createSignal(0);
 
   const reload = async () => {
     try {
@@ -126,7 +127,11 @@ export function Signage() {
       if (!data().news.length) return;
       setNewsTakeover(true);
       clearTimeout(dismissNews);
-      dismissNews = window.setTimeout(() => setNewsTakeover(false), 24 * 1000);
+      dismissNews = window.setTimeout(() => {
+        setNewsTakeover(false);
+        const count = data().news.length;
+        setNewsIndex(count ? (newsIndex() + 1) % count : 0);
+      }, 24 * 1000);
     };
     const firstNews = window.setTimeout(showNews, 30 * 1000);
     const newsCycle = window.setInterval(showNews, 3 * 60 * 1000);
@@ -146,6 +151,7 @@ export function Signage() {
     (data().attendance.state === "working"
       ? Math.max(0, (Date.now() - Date.parse(data().generatedAt)) / 1000)
       : 0);
+  const currentNews = () => data().news[newsIndex() % data().news.length];
 
   return (
     <main className="signage">
@@ -361,22 +367,20 @@ export function Signage() {
             <p>INFORMATION DISPLAY · KOFU</p>
             <h2>ニュース</h2>
           </div>
-          <ol>
-            {data()
-              .news.slice(0, 3)
-              .map((item, index) => (
-                <li key={item.url}>
-                  <b>{String(index + 1).padStart(2, "0")}</b>
-                  <div>
-                    <time>{item.published || "--:--"}</time>
-                    <strong>{item.title}</strong>
-                    <p>{item.summary}</p>
-                  </div>
-                </li>
-              ))}
-          </ol>
+          <article className="news-takeover-story">
+            <b>{String((newsIndex() % data().news.length) + 1).padStart(2, "0")}</b>
+            <div>
+              <time>{currentNews().published || "--:--"}</time>
+              <h3>{currentNews().title}</h3>
+              <p>{currentNews().summary}</p>
+            </div>
+          </article>
           <footer>
-            <span>更新 {data().generatedAt.slice(11, 16)}</span>
+            <span>
+              {String((newsIndex() % data().news.length) + 1).padStart(2, "0")} /{" "}
+              {String(data().news.length).padStart(2, "0")} · 更新{" "}
+              {data().generatedAt.slice(11, 16)}
+            </span>
             <p>このあと通常画面へ戻ります</p>
           </footer>
         </section>
