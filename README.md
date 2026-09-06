@@ -18,7 +18,6 @@ npm run dev
 | `GOOGLE_CALENDAR_ICAL_URL` | Google Calendarの「iCal形式の非公開URL」 | 未設定 |
 | `NEWS_FEED_URL` | RSS 2.0 feed | NHK 主要ニュース |
 | `FLEX_TIMER_URL` | [Flex Timer API](openapi/flex-timer.yaml) の base URL | 未設定 |
-| `FLEX_TIMER_TOKEN` | Flex Timer の Bearer token | 未設定 |
 
 `GOOGLE_CALENDAR_ICAL_URL` は認証情報として扱い、公開やGitへのコミットを避けてください。NixOSではageで暗号化したEnvironmentFileに `GOOGLE_CALENDAR_ICAL_URL=...` を保存する想定です。未設定または各サービスが停止中でも、取得済みキャッシュを表示してサイネージ全体は動作を続けます。
 

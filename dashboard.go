@@ -338,7 +338,6 @@ func (s *dashboardService) attendanceAction(ctx context.Context, action string) 
 	if err != nil {
 		return attendanceStatus{}, err
 	}
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("FLEX_TIMER_TOKEN"))
 	resp, err := s.client.Do(req)
 	if err != nil {
 		return attendanceStatus{}, err
