@@ -212,7 +212,10 @@ button {
 }
 .temperature small {
   color: var(--acid);
+  margin-left: 6px;
   font-size: 16px;
+  font-family: sans-serif;
+  letter-spacing: 0;
 }
 .condition {
   margin: 8px 0 20px;
@@ -833,13 +836,20 @@ button {
     padding-inline: 14px;
   }
   .weather-now > div {
-    gap: 8px;
+    gap: 4px;
   }
   .weather-now > div > strong {
-    font-size: 36px;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 32px;
   }
   .temperature {
-    font-size: 34px;
+    flex: none;
+    white-space: nowrap;
+    font-size: 30px;
+  }
+  .temperature small {
+    font-size: 14px;
   }
   .hourly-weather {
     padding-inline: 12px;
