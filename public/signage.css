@@ -89,19 +89,56 @@ button {
   background: rgba(14, 17, 19, 0.88);
   box-shadow: 0 16px 50px rgba(0, 0, 0, 0.22);
 }
+.weather-alert {
+  height: 48px;
+  display: grid;
+  grid-template-columns: 190px max-content 1fr;
+  align-items: center;
+  gap: 22px;
+  padding: 0 18px;
+  color: #120e07;
+  background: #ffbd2e;
+  overflow: hidden;
+  animation: alert-in 0.45s both;
+}
+.weather-alert.warning,
+.weather-alert.emergency {
+  color: #fff;
+  background: #dc2f2f;
+}
+.weather-alert.emergency {
+  animation:
+    alert-in 0.45s both,
+    alert-pulse 1.4s infinite;
+}
+.weather-alert p,
+.weather-alert span {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+.weather-alert strong {
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+.weather-alert span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .hero {
   height: 255px;
   display: grid;
-  grid-template-columns: 46% 19% 35%;
+  grid-template-columns: 30% 22% 48%;
   position: relative;
   overflow: hidden;
 }
 .hero::after {
-  content: "KOFU";
+  content: "FORECAST";
   position: absolute;
   right: -8px;
   bottom: -38px;
-  font-size: 145px;
+  font-size: 90px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.08em;
@@ -110,7 +147,7 @@ button {
   pointer-events: none;
 }
 .clock {
-  padding: 26px 30px;
+  padding: 32px 24px;
   border-right: 1px solid #33383b;
   position: relative;
 }
@@ -123,7 +160,7 @@ button {
 }
 .clock time {
   font-family: ui-monospace, "SFMono-Regular", monospace;
-  font-size: clamp(76px, 10.2vw, 132px);
+  font-size: clamp(66px, 7.2vw, 92px);
   font-weight: 200;
   line-height: 1;
   letter-spacing: -0.09em;
@@ -135,8 +172,8 @@ button {
 }
 .seconds {
   position: absolute;
-  top: 47px;
-  right: 24px;
+  top: 48px;
+  right: 18px;
   margin: 0;
   color: var(--acid);
   font:
@@ -148,34 +185,37 @@ button {
   font-size: 15px;
   letter-spacing: 0.12em;
 }
-.weather-mark {
-  display: grid;
-  place-items: center;
-  color: var(--acid);
-  font:
-    200 98px/1 ui-monospace,
-    monospace;
-  border-right: 1px solid #33383b;
-  animation: drift 8s ease-in-out infinite;
-}
 .weather-now {
-  padding: 28px 27px;
+  padding: 30px 20px;
+  border-right: 1px solid #33383b;
   position: relative;
   z-index: 1;
 }
-.temperature {
-  margin: 10px 0 -3px;
+.weather-now > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.weather-now > div > strong {
+  color: var(--acid);
   font:
-    200 58px/1 ui-monospace,
+    200 44px/1 ui-monospace,
+    monospace;
+  animation: drift 8s ease-in-out infinite;
+}
+.temperature {
+  margin: 12px 0 4px;
+  font:
+    200 40px/1 ui-monospace,
     monospace;
   letter-spacing: -0.08em;
 }
 .temperature small {
   color: var(--acid);
-  font-size: 22px;
+  font-size: 16px;
 }
 .condition {
-  margin: 10px 0 18px;
+  margin: 8px 0 20px;
   font-size: 13px;
 }
 .condition span {
@@ -184,7 +224,7 @@ button {
 }
 .weather-now dl {
   display: flex;
-  gap: 22px;
+  gap: 16px;
   margin: 0;
 }
 .weather-now dl div {
@@ -202,6 +242,73 @@ button {
     500 17px ui-monospace,
     monospace;
 }
+.hourly-weather {
+  min-width: 0;
+  padding: 23px 18px 18px;
+  position: relative;
+  z-index: 1;
+}
+.hourly-weather > header {
+  height: 25px;
+  display: flex;
+  justify-content: space-between;
+}
+.hourly-weather > header span {
+  color: #656c70;
+  font:
+    8px ui-monospace,
+    monospace;
+  letter-spacing: 0.08em;
+}
+.hourly-list {
+  height: 177px;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  border-block: 1px solid #33383b;
+}
+.hourly-item {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #292d30;
+}
+.hourly-item:last-child {
+  border-right: 0;
+}
+.hourly-item time {
+  color: #a9afb1;
+  font:
+    700 10px ui-monospace,
+    monospace;
+}
+.hourly-item > strong {
+  height: 39px;
+  color: var(--acid);
+  font:
+    300 26px/39px ui-monospace,
+    monospace;
+}
+.hourly-item > b {
+  margin-bottom: 10px;
+  font:
+    600 17px ui-monospace,
+    monospace;
+}
+.hourly-item p {
+  margin: 2px 0;
+  color: #c7cbcc;
+  font:
+    600 9px ui-monospace,
+    monospace;
+}
+.hourly-item p span {
+  display: block;
+  color: #62696c;
+  font-size: 7px;
+  text-align: center;
+}
 .content-grid {
   height: calc(100vh - 365px);
   min-height: 300px;
@@ -209,6 +316,10 @@ button {
   grid-template-columns: 1.3fr 0.85fr 1fr;
   gap: 10px;
   margin-top: 10px;
+}
+.has-weather-alert .content-grid {
+  height: calc(100vh - 413px);
+  min-height: 252px;
 }
 .content-grid article {
   min-width: 0;
@@ -651,6 +762,17 @@ button {
     transform: translateY(-5px) rotate(2deg);
   }
 }
+@keyframes alert-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4%);
+  }
+}
+@keyframes alert-pulse {
+  50% {
+    filter: brightness(1.18);
+  }
+}
 @keyframes reveal {
   from {
     opacity: 0;
@@ -702,13 +824,20 @@ button {
     padding-inline: 12px;
   }
   .hero {
-    grid-template-columns: 48% 16% 36%;
+    grid-template-columns: 30% 22% 48%;
   }
   .clock {
     padding-inline: 20px;
   }
   .weather-now {
-    padding-inline: 18px;
+    padding-inline: 14px;
+  }
+  .hourly-weather {
+    padding-inline: 12px;
+  }
+  .weather-alert {
+    grid-template-columns: 150px max-content 1fr;
+    gap: 14px;
   }
   .content-grid {
     grid-template-columns: 1.22fr 0.8fr 1fr;
@@ -733,16 +862,30 @@ button {
   }
   .hero {
     height: auto;
-    min-height: 300px;
-    grid-template-columns: 1fr 34%;
+    min-height: 430px;
+    grid-template-columns: 1fr 42%;
   }
   .clock {
-    grid-row: span 2;
+    border-bottom: 1px solid #33383b;
   }
-  .weather-mark {
+  .weather-now {
     border-right: 0;
     border-bottom: 1px solid #33383b;
-    font-size: 62px;
+  }
+  .hourly-weather {
+    grid-column: 1 / -1;
+  }
+  .weather-alert {
+    height: auto;
+    min-height: 58px;
+    grid-template-columns: max-content 1fr;
+    padding-block: 8px;
+  }
+  .weather-alert span {
+    grid-column: 1 / -1;
+  }
+  .has-weather-alert .content-grid {
+    height: auto;
   }
   .content-grid {
     height: auto;

@@ -21,6 +21,16 @@ type Forecast = {
   low: number;
   rain: number;
 };
+type HourlyWeather = {
+  time: string;
+  code: number;
+  condition: string;
+  temperature: number;
+  rain: number;
+  precip: number;
+  wind: number;
+};
+type WeatherAlert = { level: string; title: string; detail: string };
 type Event = { id: string; title: string; time: string; location: string; allDay: boolean };
 type News = { title: string; url: string; published: string; summary: string };
 type Attendance = {
@@ -35,6 +45,8 @@ type Attendance = {
 type Dashboard = {
   generatedAt: string;
   weather: Weather;
+  hourly: HourlyWeather[];
+  alerts: WeatherAlert[];
   forecast: Forecast[];
   events: Event[];
   news: News[];
@@ -54,6 +66,8 @@ const empty: Dashboard = {
     low: 0,
     rain: 0,
   },
+  hourly: [],
+  alerts: [],
   forecast: [],
   events: [],
   news: [],
@@ -152,9 +166,15 @@ export function Signage() {
       ? Math.max(0, (Date.now() - Date.parse(data().generatedAt)) / 1000)
       : 0);
   const newsPageStart = () => (newsPage() % Math.ceil(data().news.length / 3)) * 3;
+  const alertLevel = () =>
+    data().alerts.some((alert) => alert.level === "emergency")
+      ? "emergency"
+      : data().alerts.some((alert) => alert.level === "warning")
+        ? "warning"
+        : "advisory";
 
   return (
-    <main className="signage">
+    <main className={`signage ${data().alerts.length ? "has-weather-alert" : ""}`}>
       <div className="scanline" aria-hidden="true" />
       <header className="topbar">
         <p className="brand">
@@ -164,6 +184,18 @@ export function Signage() {
           {error() ? `DEGRADED · ${error()}` : "SYSTEM NORMAL"} <b />
         </p>
       </header>
+
+      {data().alerts.length > 0 && (
+        <aside className={`weather-alert ${alertLevel()}`} role="alert">
+          <p>WEATHER ALERT · 甲府市</p>
+          <strong>
+            {data()
+              .alerts.map((alert) => alert.title)
+              .join(" / ")}
+          </strong>
+          <span>{data().alerts[0].detail}</span>
+        </aside>
+      )}
 
       <section className="hero panel">
         <div className="clock">
@@ -185,15 +217,17 @@ export function Signage() {
             }
           </p>
         </div>
-        <div className="weather-mark" aria-label={data().weather.condition}>
-          {/* @client */ weatherGlyph(data().weather.code)}
-        </div>
         <div className="weather-now">
           <p className="eyebrow">WEATHER · {data().weather.place}</p>
-          <p className="temperature">
-            {data().weather.temperature.toFixed(1)}
-            <small>°C</small>
-          </p>
+          <div>
+            <strong aria-label={data().weather.condition}>
+              {/* @client */ weatherGlyph(data().weather.code)}
+            </strong>
+            <p className="temperature">
+              {data().weather.temperature.toFixed(1)}
+              <small>°C</small>
+            </p>
+          </div>
           <p className="condition">
             {data().weather.condition} <span>体感 {data().weather.apparent.toFixed(1)}°</span>
           </p>
@@ -211,6 +245,30 @@ export function Signage() {
               <dd>{data().weather.rain}%</dd>
             </div>
           </dl>
+        </div>
+        <div className="hourly-weather">
+          <header>
+            <p className="eyebrow">HOURLY FORECAST · NEXT 8 HOURS</p>
+            <span>降水確率 / 降水量 / 風速</span>
+          </header>
+          <div className="hourly-list">
+            {data().hourly.map((hour) => (
+              <div className="hourly-item" key={hour.time}>
+                <time>{hour.time}</time>
+                <strong aria-label={hour.condition}>{/* @client */ weatherGlyph(hour.code)}</strong>
+                <b>{hour.temperature.toFixed(0)}°</b>
+                <p>
+                  <span>RAIN</span> {hour.rain}%
+                </p>
+                <p>
+                  <span>PRECIP</span> {hour.precip.toFixed(1)} mm
+                </p>
+                <p>
+                  <span>WIND</span> {hour.wind.toFixed(0)} km/h
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

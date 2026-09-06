@@ -21,11 +21,29 @@ var tokyo = mustLocation("Asia/Tokyo")
 type dashboardData struct {
 	GeneratedAt string           `json:"generatedAt"`
 	Weather     weatherData      `json:"weather"`
+	Hourly      []hourlyWeather  `json:"hourly"`
+	Alerts      []weatherAlert   `json:"alerts"`
 	Forecast    []forecastDay    `json:"forecast"`
 	Events      []calendarEvent  `json:"events"`
 	News        []newsItem       `json:"news"`
 	Attendance  attendanceStatus `json:"attendance"`
 	Warnings    []string         `json:"warnings"`
+}
+
+type hourlyWeather struct {
+	Time        string  `json:"time"`
+	Code        int     `json:"code"`
+	Condition   string  `json:"condition"`
+	Temperature float64 `json:"temperature"`
+	Rain        int     `json:"rain"`
+	Precip      float64 `json:"precip"`
+	Wind        float64 `json:"wind"`
+}
+
+type weatherAlert struct {
+	Level  string `json:"level"`
+	Title  string `json:"title"`
+	Detail string `json:"detail"`
 }
 
 type weatherData struct {
@@ -94,16 +112,20 @@ func (s *dashboardService) dashboard(ctx context.Context) dashboardData {
 	}
 	s.mu.Unlock()
 
-	result := dashboardData{GeneratedAt: time.Now().Format(time.RFC3339), Forecast: []forecastDay{}, Events: []calendarEvent{}, News: []newsItem{}}
-	var weatherErr, calendarErr, newsErr, attendanceErr error
+	result := dashboardData{GeneratedAt: time.Now().Format(time.RFC3339), Hourly: []hourlyWeather{}, Alerts: []weatherAlert{}, Forecast: []forecastDay{}, Events: []calendarEvent{}, News: []newsItem{}}
+	var weatherErr, alertErr, calendarErr, newsErr, attendanceErr error
 	group, ctx := errgroup.WithContext(ctx)
 	// Source errors are dashboard data, not reasons to cancel the other panels.
-	group.Go(func() error { result.Weather, result.Forecast, weatherErr = s.fetchWeather(ctx); return nil })
+	group.Go(func() error {
+		result.Weather, result.Forecast, result.Hourly, weatherErr = s.fetchWeather(ctx)
+		return nil
+	})
+	group.Go(func() error { result.Alerts, alertErr = s.fetchWeatherAlerts(ctx); return nil })
 	group.Go(func() error { result.Events, calendarErr = s.fetchCalendar(ctx); return nil })
 	group.Go(func() error { result.News, newsErr = s.fetchNews(ctx); return nil })
 	group.Go(func() error { result.Attendance, attendanceErr = s.fetchAttendance(ctx); return nil })
 	_ = group.Wait()
-	for label, err := range map[string]error{"天気": weatherErr, "カレンダー": calendarErr, "ニュース": newsErr, "勤怠": attendanceErr} {
+	for label, err := range map[string]error{"天気": weatherErr, "警報": alertErr, "カレンダー": calendarErr, "ニュース": newsErr, "勤怠": attendanceErr} {
 		if err != nil {
 			result.Warnings = append(result.Warnings, label+": "+err.Error())
 		}
@@ -111,7 +133,10 @@ func (s *dashboardService) dashboard(ctx context.Context) dashboardData {
 	s.mu.Lock()
 	// ponytail: one shared cache is enough for one tablet; split per source if refresh rates diverge.
 	if weatherErr != nil && !s.at.IsZero() {
-		result.Weather, result.Forecast = s.cache.Weather, s.cache.Forecast
+		result.Weather, result.Forecast, result.Hourly = s.cache.Weather, s.cache.Forecast, s.cache.Hourly
+	}
+	if alertErr != nil && !s.at.IsZero() {
+		result.Alerts = s.cache.Alerts
 	}
 	if calendarErr != nil && !s.at.IsZero() {
 		result.Events = s.cache.Events
@@ -127,8 +152,8 @@ func (s *dashboardService) dashboard(ctx context.Context) dashboardData {
 	return result
 }
 
-func (s *dashboardService) fetchWeather(ctx context.Context) (weatherData, []forecastDay, error) {
-	const endpoint = "https://api.open-meteo.com/v1/forecast?latitude=35.6639&longitude=138.5683&timezone=Asia%2FTokyo&forecast_days=4&current=temperature_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+func (s *dashboardService) fetchWeather(ctx context.Context) (weatherData, []forecastDay, []hourlyWeather, error) {
+	const endpoint = "https://api.open-meteo.com/v1/forecast?latitude=35.6639&longitude=138.5683&timezone=Asia%2FTokyo&forecast_days=4&forecast_hours=12&current=temperature_2m,apparent_temperature,weather_code&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
 	var payload struct {
 		Current struct {
 			Temperature float64 `json:"temperature_2m"`
@@ -142,9 +167,17 @@ func (s *dashboardService) fetchWeather(ctx context.Context) (weatherData, []for
 			Low  []float64 `json:"temperature_2m_min"`
 			Rain []int     `json:"precipitation_probability_max"`
 		} `json:"daily"`
+		Hourly struct {
+			Time        []string  `json:"time"`
+			Temperature []float64 `json:"temperature_2m"`
+			Rain        []int     `json:"precipitation_probability"`
+			Precip      []float64 `json:"precipitation"`
+			Code        []int     `json:"weather_code"`
+			Wind        []float64 `json:"wind_speed_10m"`
+		} `json:"hourly"`
 	}
 	if err := s.getJSON(ctx, endpoint, &payload); err != nil {
-		return weatherData{}, nil, err
+		return weatherData{}, nil, nil, err
 	}
 	forecast := make([]forecastDay, 0, len(payload.Daily.Time))
 	for i, date := range payload.Daily.Time {
@@ -158,7 +191,80 @@ func (s *dashboardService) fetchWeather(ctx context.Context) (weatherData, []for
 	if len(forecast) > 0 {
 		w.High, w.Low, w.Rain = forecast[0].High, forecast[0].Low, forecast[0].Rain
 	}
-	return w, forecast, nil
+	hourly := make([]hourlyWeather, 0, 8)
+	for i := 1; i < len(payload.Hourly.Time) && len(hourly) < 8; i++ {
+		if i >= len(payload.Hourly.Code) || i >= len(payload.Hourly.Temperature) || i >= len(payload.Hourly.Rain) || i >= len(payload.Hourly.Precip) || i >= len(payload.Hourly.Wind) {
+			break
+		}
+		hour, err := time.Parse("2006-01-02T15:04", payload.Hourly.Time[i])
+		if err != nil {
+			continue
+		}
+		hourly = append(hourly, hourlyWeather{hour.Format("15:04"), payload.Hourly.Code[i], weatherLabel(payload.Hourly.Code[i]), payload.Hourly.Temperature[i], payload.Hourly.Rain[i], payload.Hourly.Precip[i], payload.Hourly.Wind[i]})
+	}
+	return w, forecast, hourly, nil
+}
+
+type jmaWarningReport struct {
+	Headline string `json:"headlineText"`
+	Warning  struct {
+		Items []struct {
+			AreaCode string `json:"areaCode"`
+			Kinds    []struct {
+				Code   string `json:"code"`
+				Status string `json:"status"`
+			} `json:"kinds"`
+		} `json:"class20Items"`
+	} `json:"warning"`
+}
+
+func (s *dashboardService) fetchWeatherAlerts(ctx context.Context) ([]weatherAlert, error) {
+	const endpoint = "https://www.jma.go.jp/bosai/warning/data/r8/190000.json"
+	var reports []jmaWarningReport
+	if err := s.getJSON(ctx, endpoint, &reports); err != nil {
+		return nil, err
+	}
+	return parseWeatherAlerts(reports), nil
+}
+
+func parseWeatherAlerts(reports []jmaWarningReport) []weatherAlert {
+	alerts := []weatherAlert{}
+	seen := map[string]bool{}
+	for _, report := range reports {
+		for _, item := range report.Warning.Items {
+			if item.AreaCode != "1920100" {
+				continue
+			}
+			for _, kind := range item.Kinds {
+				if kind.Code == "" || kind.Status == "解除" || kind.Status == "発表警報・注意報はなし" || seen[kind.Code] {
+					continue
+				}
+				title, level := weatherAlertKind(kind.Code)
+				alerts = append(alerts, weatherAlert{level, title, strings.TrimSpace(report.Headline)})
+				seen[kind.Code] = true
+			}
+		}
+	}
+	return alerts
+}
+
+func weatherAlertKind(code string) (string, string) {
+	names := map[string]string{
+		"02": "暴風雪警報", "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "06": "大雪警報", "07": "波浪警報", "08": "高潮警報",
+		"10": "大雨注意報", "12": "大雪注意報", "13": "風雪注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報", "17": "融雪注意報", "18": "洪水注意報", "19": "高潮注意報", "20": "濃霧注意報", "21": "乾燥注意報", "22": "なだれ注意報", "23": "低温注意報", "24": "霜注意報", "25": "着氷注意報", "26": "着雪注意報",
+		"32": "暴風雪特別警報", "33": "大雨特別警報", "35": "暴風特別警報", "36": "大雪特別警報", "37": "波浪特別警報", "38": "高潮特別警報",
+	}
+	level := "warning"
+	if code >= "10" && code <= "26" {
+		level = "advisory"
+	}
+	if code >= "32" && code <= "38" {
+		level = "emergency"
+	}
+	if name := names[code]; name != "" {
+		return name, level
+	}
+	return "気象警報・注意報", level
 }
 
 func (s *dashboardService) fetchNews(ctx context.Context) ([]newsItem, error) {
