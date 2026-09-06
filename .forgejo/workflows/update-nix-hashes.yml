@@ -1,0 +1,42 @@
+name: Update Nix dependency hashes
+
+on:
+  push:
+    paths:
+      - go.mod
+      - go.sum
+      - package-lock.json
+      - scripts/update-nix-hashes.sh
+      - .forgejo/workflows/update-nix-hashes.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nix-dependency-hashes-${{ forgejo.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: docker
+    timeout-minutes: 15
+    steps:
+      - uses: https://data.forgejo.org/actions/checkout@v6
+        with:
+          ref: ${{ forgejo.ref_name }}
+      - name: Install sudo
+        run: |
+          apt-get update
+          apt-get install --yes sudo
+      - uses: https://github.com/cachix/install-nix-action@v31
+      - run: ./scripts/update-nix-hashes.sh
+      - name: Commit and push
+        run: |
+          if git diff --quiet -- flake.nix; then
+            exit 0
+          fi
+          git config user.name "forgejo-actions[bot]"
+          git config user.email "forgejo-actions[bot]@users.noreply.local"
+          git add flake.nix
+          git commit -m "fix: update Nix dependency hashes"
+          git push

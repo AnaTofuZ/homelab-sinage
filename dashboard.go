@@ -8,13 +8,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 	"sync"
 	"time"
 
-	"golang.org/x/oauth2/google"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -160,47 +158,6 @@ func (s *dashboardService) fetchWeather(ctx context.Context) (weatherData, []for
 		w.High, w.Low, w.Rain = forecast[0].High, forecast[0].Low, forecast[0].Rain
 	}
 	return w, forecast, nil
-}
-
-func (s *dashboardService) fetchCalendar(ctx context.Context) ([]calendarEvent, error) {
-	calendarID, credentials := os.Getenv("GOOGLE_CALENDAR_ID"), os.Getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
-	if calendarID == "" || credentials == "" {
-		return []calendarEvent{}, errors.New("未設定")
-	}
-	secret, err := os.ReadFile(credentials)
-	if err != nil {
-		return nil, err
-	}
-	config, err := google.JWTConfigFromJSON(secret, "https://www.googleapis.com/auth/calendar.readonly")
-	if err != nil {
-		return nil, err
-	}
-	client := config.Client(ctx)
-	now := time.Now().In(tokyo)
-	end := time.Date(now.Year(), now.Month(), now.Day()+2, 0, 0, 0, 0, tokyo)
-	query := url.Values{"singleEvents": {"true"}, "orderBy": {"startTime"}, "timeZone": {"Asia/Tokyo"}, "timeMin": {now.Format(time.RFC3339)}, "timeMax": {end.Format(time.RFC3339)}, "maxResults": {"12"}}
-	endpoint := "https://www.googleapis.com/calendar/v3/calendars/" + url.PathEscape(calendarID) + "/events?" + query.Encode()
-	var payload struct {
-		Items []struct {
-			ID, Summary, Location string
-			Start                 struct{ Date, DateTime string }
-		} `json:"items"`
-	}
-	if err := getJSONWith(ctx, client, endpoint, &payload); err != nil {
-		return nil, err
-	}
-	events := make([]calendarEvent, 0, len(payload.Items))
-	for _, item := range payload.Items {
-		allDay := item.Start.DateTime == ""
-		label := "終日"
-		if !allDay {
-			if parsed, err := time.Parse(time.RFC3339, item.Start.DateTime); err == nil {
-				label = parsed.In(tokyo).Format("15:04")
-			}
-		}
-		events = append(events, calendarEvent{ID: item.ID, Title: item.Summary, Time: label, Location: item.Location, AllDay: allDay})
-	}
-	return events, nil
 }
 
 func (s *dashboardService) fetchNews(ctx context.Context) ([]newsItem, error) {
