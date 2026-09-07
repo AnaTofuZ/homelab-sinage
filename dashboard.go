@@ -107,7 +107,7 @@ func newDashboardService(client *http.Client) *dashboardService {
 
 func (s *dashboardService) dashboard(ctx context.Context) dashboardData {
 	s.mu.Lock()
-	if time.Since(s.at) < 5*time.Minute {
+	if time.Since(s.at) < 4*time.Minute+30*time.Second {
 		cached := s.cache
 		s.mu.Unlock()
 		return cached
