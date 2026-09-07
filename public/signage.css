@@ -547,6 +547,12 @@ button {
   padding: 0 22px;
   text-align: center;
 }
+.attendance-data:not([hidden]) {
+  display: contents;
+}
+.attendance-empty[hidden] {
+  display: none !important;
+}
 .newsbar {
   position: fixed;
   z-index: 4;
@@ -760,6 +766,80 @@ button {
 .schedule-takeover li > b {
   font-size: 13px;
 }
+.attendance-takeover::after {
+  content: "ATTENDANCE";
+}
+.attendance-takeover {
+  display: none;
+}
+.attendance-takeover.is-visible {
+  display: grid;
+}
+.attendance-takeover-content {
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  min-height: 0;
+  border-top: 3px solid var(--acid);
+  border-bottom: 1px solid #3a3f42;
+}
+.attendance-takeover-worked {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  align-items: baseline;
+  padding: 20px 28px;
+  border-right: 1px solid #3a3f42;
+}
+.attendance-takeover-worked p {
+  width: 100%;
+  margin: 0;
+  color: var(--acid);
+  font:
+    700 11px ui-monospace,
+    monospace;
+  letter-spacing: 0.18em;
+}
+.attendance-takeover-worked strong {
+  font:
+    300 clamp(64px, 11vw, 120px) ui-monospace,
+    monospace;
+  letter-spacing: -0.07em;
+}
+.attendance-takeover-worked span {
+  margin-left: 14px;
+  color: #777e82;
+  font:
+    400 clamp(18px, 2.5vw, 30px) ui-monospace,
+    monospace;
+}
+.attendance-takeover dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+.attendance-takeover dl div {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding: 16px 20px;
+  border-left: 1px solid #3a3f42;
+  border-bottom: 1px solid #3a3f42;
+}
+.attendance-takeover dt {
+  color: #7e8588;
+  font:
+    700 9px ui-monospace,
+    monospace;
+  letter-spacing: 0.14em;
+}
+.attendance-takeover dd {
+  margin: 8px 0 0;
+  color: var(--acid);
+  font:
+    400 clamp(20px, 3vw, 36px) ui-monospace,
+    monospace;
+}
 .reveal {
   animation: reveal 0.7s both;
 }
@@ -951,5 +1031,15 @@ button {
   .news-takeover li p {
     grid-column: 1 / -1;
     -webkit-line-clamp: 2;
+  }
+  .attendance-takeover-content {
+    grid-template-columns: 1fr;
+  }
+  .attendance-takeover-worked {
+    padding-block: 12px;
+    border-right: 0;
+  }
+  .attendance-takeover-worked strong {
+    font-size: clamp(48px, 15vw, 84px);
   }
 }
