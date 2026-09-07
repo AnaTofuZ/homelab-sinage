@@ -63,6 +63,8 @@ type Event struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Time     string `json:"time"`
+	EndTime  string `json:"endTime"`
+	Day      string `json:"day"`
 	Location string `json:"location"`
 	AllDay   bool   `json:"allDay"`
 }
@@ -108,20 +110,22 @@ type SignageInput struct {
 
 // SignageProps is the props type for the Signage component.
 type SignageProps struct {
-	ScopeID       string                 `json:"-"`
-	BfIsRoot      bool                   `json:"-"`
-	BfIsChild     bool                   `json:"-"`
-	BfParent      string                 `json:"-"`
-	BfMount       string                 `json:"-"`
-	BfDataKey     string                 `json:"-"`
-	Scripts       *bf.ScriptCollector    `json:"-"`
-	BfCallerProps map[string]interface{} `json:"-"`
-	Data          Dashboard              `json:"-"`
-	Now           interface{}            `json:"-"`
-	Busy          bool                   `json:"-"`
-	Error         string                 `json:"-"`
-	NewsTakeover  bool                   `json:"-"`
-	NewsPage      int                    `json:"-"`
+	ScopeID          string                 `json:"-"`
+	BfIsRoot         bool                   `json:"-"`
+	BfIsChild        bool                   `json:"-"`
+	BfParent         string                 `json:"-"`
+	BfMount          string                 `json:"-"`
+	BfDataKey        string                 `json:"-"`
+	Scripts          *bf.ScriptCollector    `json:"-"`
+	BfCallerProps    map[string]interface{} `json:"-"`
+	Data             Dashboard              `json:"-"`
+	Now              interface{}            `json:"-"`
+	Busy             bool                   `json:"-"`
+	Error            string                 `json:"-"`
+	NewsTakeover     bool                   `json:"-"`
+	NewsPage         int                    `json:"-"`
+	ScheduleTakeover bool                   `json:"-"`
+	SchedulePage     int                    `json:"-"`
 }
 
 // NewSignageProps creates SignageProps from SignageInput.
@@ -134,15 +138,17 @@ func NewSignageProps(in SignageInput) SignageProps {
 	bfCallerProps := map[string]interface{}{}
 
 	return SignageProps{
-		ScopeID:       scopeID,
-		BfParent:      in.BfParent,
-		BfMount:       in.BfMount,
-		BfCallerProps: bfCallerProps,
-		Data:          Dashboard{},
-		Now:           nil,
-		Busy:          false,
-		Error:         "",
-		NewsTakeover:  false,
-		NewsPage:      0,
+		ScopeID:          scopeID,
+		BfParent:         in.BfParent,
+		BfMount:          in.BfMount,
+		BfCallerProps:    bfCallerProps,
+		Data:             Dashboard{},
+		Now:              nil,
+		Busy:             false,
+		Error:            "",
+		NewsTakeover:     false,
+		NewsPage:         0,
+		ScheduleTakeover: false,
+		SchedulePage:     0,
 	}
 }

@@ -71,6 +71,8 @@ type calendarEvent struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Time     string `json:"time"`
+	EndTime  string `json:"endTime"`
+	Day      string `json:"day"`
 	Location string `json:"location"`
 	AllDay   bool   `json:"allDay"`
 }

@@ -362,18 +362,28 @@ button {
 .schedule li {
   min-height: 57px;
   display: grid;
-  grid-template-columns: 48px 10px 1fr;
+  grid-template-columns: 76px 10px 1fr;
   align-items: center;
   gap: 9px;
   border-bottom: 1px solid #292d30;
   animation: slide-in 0.55s both;
   animation-delay: var(--delay);
 }
+.schedule-today + .schedule-tomorrow {
+  border-top: 2px solid var(--acid);
+}
 .schedule li > time {
+  display: grid;
+  gap: 3px;
   color: var(--acid);
   font:
-    600 12px ui-monospace,
+    600 10px ui-monospace,
     monospace;
+}
+.schedule li > time small {
+  color: #7f868a;
+  font-size: 8px;
+  letter-spacing: 0.12em;
 }
 .schedule li > i {
   height: 100%;
@@ -398,7 +408,7 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.schedule small {
+.schedule li > div small {
   display: block;
   color: #737a7e;
   font-size: 9px;
@@ -740,6 +750,15 @@ button {
 }
 .news-takeover > footer span {
   color: var(--acid);
+}
+.schedule-takeover::after {
+  content: "SCHEDULE";
+}
+.schedule-takeover ol {
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+.schedule-takeover li > b {
+  font-size: 13px;
 }
 .reveal {
   animation: reveal 0.7s both;
