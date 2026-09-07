@@ -19,136 +19,136 @@ func randomID(n int) string {
 
 // BurnInGuardInput is the user-facing input type.
 type BurnInGuardInput struct {
-	ScopeID string // Optional: if empty, random ID is generated
+	ScopeID  string // Optional: if empty, random ID is generated
 	BfParent string // Optional: parent scope id
-	BfMount string // Optional: slot id in parent
+	BfMount  string // Optional: slot id in parent
 }
 
 // BurnInGuardProps is the props type for the BurnInGuard component.
 type BurnInGuardProps struct {
-	ScopeID string `json:"-"`
-	BfIsRoot bool `json:"-"`
-	BfIsChild bool `json:"-"`
-	BfParent string `json:"-"`
-	BfMount string `json:"-"`
-	BfDataKey string `json:"-"`
-	Scripts *bf.ScriptCollector `json:"-"`
+	ScopeID       string                 `json:"-"`
+	BfIsRoot      bool                   `json:"-"`
+	BfIsChild     bool                   `json:"-"`
+	BfParent      string                 `json:"-"`
+	BfMount       string                 `json:"-"`
+	BfDataKey     string                 `json:"-"`
+	Scripts       *bf.ScriptCollector    `json:"-"`
 	BfCallerProps map[string]interface{} `json:"-"`
-	Visible bool `json:"-"`
+	Visible       bool                   `json:"-"`
 }
 
 // Weather represents a weather.
 type Weather struct {
-	Place string `json:"place"`
-	Temperature int `json:"temperature"`
-	Apparent int `json:"apparent"`
-	Code int `json:"code"`
-	Condition string `json:"condition"`
-	High int `json:"high"`
-	Low int `json:"low"`
-	Rain int `json:"rain"`
+	Place       string `json:"place"`
+	Temperature int    `json:"temperature"`
+	Apparent    int    `json:"apparent"`
+	Code        int    `json:"code"`
+	Condition   string `json:"condition"`
+	High        int    `json:"high"`
+	Low         int    `json:"low"`
+	Rain        int    `json:"rain"`
 }
 
 // Forecast represents a forecast.
 type Forecast struct {
-	Date string `json:"date"`
-	Weekday string `json:"weekday"`
-	Code int `json:"code"`
+	Date      string `json:"date"`
+	Weekday   string `json:"weekday"`
+	Code      int    `json:"code"`
 	Condition string `json:"condition"`
-	High int `json:"high"`
-	Low int `json:"low"`
-	Rain int `json:"rain"`
+	High      int    `json:"high"`
+	Low       int    `json:"low"`
+	Rain      int    `json:"rain"`
 }
 
 // HourlyWeather represents a hourlyweather.
 type HourlyWeather struct {
-	Time string `json:"time"`
-	Code int `json:"code"`
-	Condition string `json:"condition"`
-	Temperature int `json:"temperature"`
-	Rain int `json:"rain"`
-	Precip int `json:"precip"`
-	Wind int `json:"wind"`
+	Time        string `json:"time"`
+	Code        int    `json:"code"`
+	Condition   string `json:"condition"`
+	Temperature int    `json:"temperature"`
+	Rain        int    `json:"rain"`
+	Precip      int    `json:"precip"`
+	Wind        int    `json:"wind"`
 }
 
 // WeatherAlert represents a weatheralert.
 type WeatherAlert struct {
-	Level string `json:"level"`
-	Title string `json:"title"`
+	Level  string `json:"level"`
+	Title  string `json:"title"`
 	Detail string `json:"detail"`
 }
 
 // Event represents a event.
 type Event struct {
-	ID string `json:"id"`
-	Title string `json:"title"`
-	Time string `json:"time"`
-	EndTime string `json:"endTime"`
-	Day string `json:"day"`
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Time     string `json:"time"`
+	EndTime  string `json:"endTime"`
+	Day      string `json:"day"`
 	Location string `json:"location"`
-	AllDay bool `json:"allDay"`
+	AllDay   bool   `json:"allDay"`
 }
 
 // News represents a news.
 type News struct {
-	Title string `json:"title"`
-	URL string `json:"url"`
+	Title     string `json:"title"`
+	URL       string `json:"url"`
 	Published string `json:"published"`
-	Summary string `json:"summary"`
+	Summary   string `json:"summary"`
 }
 
 // Attendance represents a attendance.
 type Attendance struct {
-	Available bool `json:"available"`
-	State string `json:"state"`
-	WorkedSeconds int `json:"workedSeconds"`
-	TargetSeconds int `json:"targetSeconds"`
-	DayDifference int `json:"dayDifference"`
-	MonthDifference int `json:"monthDifference"`
-	ProjectedSeconds int `json:"projectedSeconds"`
+	Available        bool   `json:"available"`
+	State            string `json:"state"`
+	WorkedSeconds    int    `json:"workedSeconds"`
+	TargetSeconds    int    `json:"targetSeconds"`
+	DayDifference    int    `json:"dayDifference"`
+	MonthDifference  int    `json:"monthDifference"`
+	ProjectedSeconds int    `json:"projectedSeconds"`
 }
 
 // Dashboard represents a dashboard.
 type Dashboard struct {
-	GeneratedAt string `json:"generatedAt"`
-	Weather Weather `json:"weather"`
-	Hourly []HourlyWeather `json:"hourly"`
-	Alerts []WeatherAlert `json:"alerts"`
-	Forecast []Forecast `json:"forecast"`
-	Events []Event `json:"events"`
-	News []News `json:"news"`
-	Attendance Attendance `json:"attendance"`
-	Warnings []string `json:"warnings"`
+	GeneratedAt string          `json:"generatedAt"`
+	Weather     Weather         `json:"weather"`
+	Hourly      []HourlyWeather `json:"hourly"`
+	Alerts      []WeatherAlert  `json:"alerts"`
+	Forecast    []Forecast      `json:"forecast"`
+	Events      []Event         `json:"events"`
+	News        []News          `json:"news"`
+	Attendance  Attendance      `json:"attendance"`
+	Warnings    []string        `json:"warnings"`
 }
 
 // SignageInput is the user-facing input type.
 type SignageInput struct {
-	ScopeID string // Optional: if empty, random ID is generated
+	ScopeID  string // Optional: if empty, random ID is generated
 	BfParent string // Optional: parent scope id
-	BfMount string // Optional: slot id in parent
+	BfMount  string // Optional: slot id in parent
 }
 
 // SignageProps is the props type for the Signage component.
 type SignageProps struct {
-	ScopeID string `json:"-"`
-	BfIsRoot bool `json:"-"`
-	BfIsChild bool `json:"-"`
-	BfParent string `json:"-"`
-	BfMount string `json:"-"`
-	BfDataKey string `json:"-"`
-	Scripts *bf.ScriptCollector `json:"-"`
-	BfCallerProps map[string]interface{} `json:"-"`
-	Data Dashboard `json:"-"`
-	Now interface{} `json:"-"`
-	AttendanceUpdatedAt interface{} `json:"-"`
-	Busy bool `json:"-"`
-	Error string `json:"-"`
-	NewsTakeover bool `json:"-"`
-	NewsPage int `json:"-"`
-	ScheduleTakeover bool `json:"-"`
-	SchedulePage int `json:"-"`
-	AttendanceTakeover bool `json:"-"`
-	BurnInGuardSlot124 BurnInGuardProps `json:"-"`
+	ScopeID             string                 `json:"-"`
+	BfIsRoot            bool                   `json:"-"`
+	BfIsChild           bool                   `json:"-"`
+	BfParent            string                 `json:"-"`
+	BfMount             string                 `json:"-"`
+	BfDataKey           string                 `json:"-"`
+	Scripts             *bf.ScriptCollector    `json:"-"`
+	BfCallerProps       map[string]interface{} `json:"-"`
+	Data                Dashboard              `json:"-"`
+	Now                 interface{}            `json:"-"`
+	AttendanceUpdatedAt interface{}            `json:"-"`
+	Busy                bool                   `json:"-"`
+	Error               string                 `json:"-"`
+	NewsTakeover        bool                   `json:"-"`
+	NewsPage            int                    `json:"-"`
+	ScheduleTakeover    bool                   `json:"-"`
+	SchedulePage        int                    `json:"-"`
+	AttendanceTakeover  bool                   `json:"-"`
+	BurnInGuardSlot124  BurnInGuardProps       `json:"-"`
 }
 
 // NewBurnInGuardProps creates BurnInGuardProps from BurnInGuardInput.
@@ -161,11 +161,11 @@ func NewBurnInGuardProps(in BurnInGuardInput) BurnInGuardProps {
 	bfCallerProps := map[string]interface{}{}
 
 	return BurnInGuardProps{
-		ScopeID: scopeID,
-		BfParent: in.BfParent,
-		BfMount: in.BfMount,
+		ScopeID:       scopeID,
+		BfParent:      in.BfParent,
+		BfMount:       in.BfMount,
 		BfCallerProps: bfCallerProps,
-		Visible: false,
+		Visible:       false,
 	}
 }
 
@@ -179,24 +179,24 @@ func NewSignageProps(in SignageInput) SignageProps {
 	bfCallerProps := map[string]interface{}{}
 
 	return SignageProps{
-		ScopeID: scopeID,
-		BfParent: in.BfParent,
-		BfMount: in.BfMount,
-		BfCallerProps: bfCallerProps,
-		Data: Dashboard{},
-		Now: nil,
+		ScopeID:             scopeID,
+		BfParent:            in.BfParent,
+		BfMount:             in.BfMount,
+		BfCallerProps:       bfCallerProps,
+		Data:                Dashboard{},
+		Now:                 nil,
 		AttendanceUpdatedAt: nil,
-		Busy: false,
-		Error: "",
-		NewsTakeover: false,
-		NewsPage: 0,
-		ScheduleTakeover: false,
-		SchedulePage: 0,
-		AttendanceTakeover: false,
+		Busy:                false,
+		Error:               "",
+		NewsTakeover:        false,
+		NewsPage:            0,
+		ScheduleTakeover:    false,
+		SchedulePage:        0,
+		AttendanceTakeover:  false,
 		BurnInGuardSlot124: NewBurnInGuardProps(BurnInGuardInput{
-			ScopeID: scopeID + "_s124",
+			ScopeID:  scopeID + "_s124",
 			BfParent: scopeID,
-			BfMount: "s124",
+			BfMount:  "s124",
 		}),
 	}
 }

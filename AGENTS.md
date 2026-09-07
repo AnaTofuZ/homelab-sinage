@@ -23,5 +23,6 @@
 ## Verification
 
 - Run `npm run format:check`, `npm run lint`, `npm run typecheck`, and `go test ./...`.
+- After changing a BarefootJS component, run `npm run build:ui`, then `gofmt -w components.go`, and commit the regenerated `components.go`; CI verifies that exact sequence.
 - Visually inspect the dashboard at `800 x 500`; confirm that the clock, current weather, hourly forecast, cards, and ticker remain within their borders.
-- Edit source files only. `dist/` and generated Go component output are build artifacts.
+- Do not hand-edit `dist/` or generated Go component output. `dist/` is a build artifact; `components.go` is generated but tracked for CI.
