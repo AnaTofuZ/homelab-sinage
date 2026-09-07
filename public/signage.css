@@ -1,6 +1,13 @@
+@font-face {
+  font-family: "Home Signal Sans";
+  src: url("/static/fonts/NotoSansJP.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 :root {
   color-scheme: dark;
-  font-family: "Helvetica Neue", "Noto Sans JP", sans-serif;
+  font-family: "Home Signal Sans", sans-serif;
   color: #f4f1e8;
   background: #090b0d;
   font-synthesis: none;
@@ -739,7 +746,7 @@ button {
   display: -webkit-box;
   overflow: hidden;
   font-size: clamp(15px, 1.8vw, 23px);
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -840,6 +847,169 @@ button {
     400 clamp(20px, 3vw, 36px) ui-monospace,
     monospace;
 }
+.burnin-guard {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+  color: #080a0b;
+  background: #f2efe6;
+  pointer-events: none;
+}
+.burnin-guard.is-visible {
+  display: block;
+  animation: burnin-stage 36s both;
+}
+.burnin-guard::before,
+.burnin-guard::after {
+  content: "";
+  position: absolute;
+  width: 42vmax;
+  height: 42vmax;
+  background: var(--acid);
+  border-radius: 50%;
+  animation: burnin-orbit 8s linear infinite alternate;
+}
+.burnin-guard::after {
+  width: 14vmax;
+  height: 140vmax;
+  background: #ff4b35;
+  border-radius: 0;
+  animation: burnin-slash 6s ease-in-out infinite alternate;
+}
+.burnin-symbols {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.burnin-field {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+}
+.burnin-picto {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(74px, 13vw, 170px);
+  aspect-ratio: 1;
+  margin: 0;
+  color: #080a0b;
+  background: var(--acid);
+  overflow: hidden;
+  animation: scatter-a 7s ease-in-out infinite alternate;
+}
+.burnin-picto:nth-child(even) {
+  color: #f2efe6;
+  background: #080a0b;
+  animation-name: scatter-b;
+  animation-delay: -3s;
+}
+.burnin-picto:nth-child(3n) {
+  color: #080a0b;
+  background: #ff4b35;
+  animation-name: scatter-c;
+  animation-delay: -5s;
+}
+.burnin-picto svg {
+  width: 68%;
+  height: 68%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 7;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+.picto-home svg,
+.picto-bolt svg {
+  fill: currentColor;
+  stroke-width: 3;
+}
+.burnin-picto figcaption {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font:
+    900 8px ui-monospace,
+    monospace;
+  letter-spacing: 0.18em;
+}
+.scatter-1 {
+  left: 2%;
+  top: 4%;
+}
+.scatter-2 {
+  left: 24%;
+  top: 12%;
+}
+.scatter-3 {
+  left: 50%;
+  top: -3%;
+}
+.scatter-4 {
+  right: 3%;
+  top: 8%;
+}
+.scatter-5 {
+  left: 10%;
+  top: 53%;
+}
+.scatter-6 {
+  left: 36%;
+  top: 60%;
+}
+.scatter-7 {
+  right: 19%;
+  top: 42%;
+}
+.scatter-8 {
+  right: -2%;
+  bottom: -3%;
+}
+.scatter-9 {
+  left: -4%;
+  top: 31%;
+}
+.scatter-10 {
+  left: 45%;
+  top: 28%;
+}
+.scatter-11 {
+  right: 32%;
+  top: 5%;
+}
+.scatter-12 {
+  left: 25%;
+  bottom: -8%;
+}
+.burnin-type {
+  position: absolute;
+  z-index: -1;
+  color: #080a0b;
+  font:
+    900 clamp(90px, 25vw, 340px) / 0.8 ui-monospace,
+    monospace;
+  letter-spacing: -0.12em;
+  white-space: nowrap;
+  -webkit-text-stroke: 2px #f2efe6;
+  animation: scatter-b 9s linear infinite alternate;
+}
+.type-a {
+  left: 8%;
+  top: 25%;
+}
+.type-b {
+  right: -12%;
+  top: 55%;
+  animation-name: scatter-a;
+}
+.type-c {
+  left: 42%;
+  top: 2%;
+  animation-name: scatter-c;
+}
 .reveal {
   animation: reveal 0.7s both;
 }
@@ -913,12 +1083,68 @@ button {
     transform: translateX(45px);
   }
 }
+@keyframes burnin-stage {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(5%);
+  }
+  3%,
+  94% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  32% {
+    background: #080a0b;
+  }
+  33%,
+  65% {
+    background: var(--acid);
+  }
+  66% {
+    background: #f2efe6;
+  }
+}
+@keyframes burnin-orbit {
+  from {
+    transform: translate(-35%, -45%) scale(0.7);
+  }
+  to {
+    transform: translate(170%, 70%) scale(1.3);
+  }
+}
+@keyframes burnin-slash {
+  from {
+    transform: translate(-120%, -35%) rotate(30deg);
+  }
+  to {
+    transform: translate(760%, -35%) rotate(30deg);
+  }
+}
+@keyframes scatter-a {
+  to {
+    transform: translate(25vw, 18vh) rotate(110deg) scale(0.68);
+  }
+}
+@keyframes scatter-b {
+  to {
+    transform: translate(-22vw, 27vh) rotate(-150deg) scale(1.28);
+  }
+}
+@keyframes scatter-c {
+  to {
+    transform: translate(13vw, -24vh) rotate(210deg) scale(0.82);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+  .burnin-guard.is-visible {
+    animation: none !important;
   }
 }
 @media (max-width: 900px) {
