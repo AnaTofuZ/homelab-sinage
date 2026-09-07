@@ -109,18 +109,22 @@ function weatherGlyph(code: number) {
 export function Signage() {
   const [data, setData] = createSignal<Dashboard>(empty);
   const [now, setNow] = createSignal(new Date());
+  const [attendanceUpdatedAt, setAttendanceUpdatedAt] = createSignal(Date.now());
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
   const [newsTakeover, setNewsTakeover] = createSignal(false);
   const [newsPage, setNewsPage] = createSignal(0);
   const [scheduleTakeover, setScheduleTakeover] = createSignal(false);
   const [schedulePage, setSchedulePage] = createSignal(0);
+  const [attendanceTakeover, setAttendanceTakeover] = createSignal(false);
 
   const reload = async () => {
     try {
       const response = await fetch("/api/dashboard");
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      setData(await response.json());
+      const body = await response.json();
+      setAttendanceUpdatedAt(Date.parse(body.generatedAt));
+      setData(body);
       setError("");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "更新できません");
@@ -133,6 +137,7 @@ export function Signage() {
       const response = await fetch(`/api/attendance/${name}`, { method: "POST" });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? `HTTP ${response.status}`);
+      setAttendanceUpdatedAt(Date.now());
       setData({ ...data(), attendance: body });
       setError("");
     } catch (reason) {
@@ -148,7 +153,7 @@ export function Signage() {
     const refresh = window.setInterval(() => void reload(), 5 * 60 * 1000);
     let dismissNews = 0;
     const showNews = () => {
-      if (!data().news.length || scheduleTakeover()) return;
+      if (!data().news.length || scheduleTakeover() || attendanceTakeover()) return;
       setNewsTakeover(true);
       clearTimeout(dismissNews);
       dismissNews = window.setTimeout(() => {
@@ -161,7 +166,7 @@ export function Signage() {
     const newsCycle = window.setInterval(showNews, 3 * 60 * 1000);
     let dismissSchedule = 0;
     const showSchedule = () => {
-      if (!data().events.length || newsTakeover()) return;
+      if (!data().events.length || newsTakeover() || attendanceTakeover()) return;
       setScheduleTakeover(true);
       clearTimeout(dismissSchedule);
       dismissSchedule = window.setTimeout(() => {
@@ -172,15 +177,27 @@ export function Signage() {
     };
     const firstSchedule = window.setTimeout(showSchedule, 90 * 1000);
     const scheduleCycle = window.setInterval(showSchedule, 3 * 60 * 1000);
+    let dismissAttendance = 0;
+    const showAttendance = () => {
+      if (!data().attendance.available || newsTakeover() || scheduleTakeover()) return;
+      setAttendanceTakeover(true);
+      clearTimeout(dismissAttendance);
+      dismissAttendance = window.setTimeout(() => setAttendanceTakeover(false), 24 * 1000);
+    };
+    const firstAttendance = window.setTimeout(showAttendance, 150 * 1000);
+    const attendanceCycle = window.setInterval(showAttendance, 3 * 60 * 1000);
     onCleanup(() => {
       clearInterval(clock);
       clearInterval(refresh);
       clearInterval(newsCycle);
       clearInterval(scheduleCycle);
+      clearInterval(attendanceCycle);
       clearTimeout(firstNews);
       clearTimeout(dismissNews);
       clearTimeout(firstSchedule);
       clearTimeout(dismissSchedule);
+      clearTimeout(firstAttendance);
+      clearTimeout(dismissAttendance);
     });
   });
 
@@ -189,7 +206,7 @@ export function Signage() {
   const shownWorked = () =>
     data().attendance.workedSeconds +
     (data().attendance.state === "working"
-      ? Math.max(0, (Date.now() - Date.parse(data().generatedAt)) / 1000)
+      ? Math.max(0, (now().getTime() - attendanceUpdatedAt()) / 1000)
       : 0);
   const newsPageStart = () => (newsPage() % Math.ceil(data().news.length / 3)) * 3;
   const schedulePageStart = () => (schedulePage() % Math.ceil(data().events.length / 4)) * 4;
@@ -366,55 +383,54 @@ export function Signage() {
               {/* @client */ stateLabel()}
             </b>
           </header>
-          {data().attendance.available ? (
-            <>
-              <div className="worked">
-                <p>WORKED TODAY</p>
-                <strong>{/* @client */ duration(shownWorked())}</strong>
-                <small>/ {/* @client */ duration(data().attendance.targetSeconds)}</small>
-              </div>
-              <div className="balance">
-                <p>
-                  DAY{" "}
-                  <b>
-                    {/* @client */ duration(shownWorked() - data().attendance.targetSeconds, true)}
-                  </b>
-                </p>
-                <p>
-                  MONTH <b>{/* @client */ duration(data().attendance.monthDifference, true)}</b>
-                </p>
-              </div>
-              <div className="actions">
-                {data().attendance.state === "off" && (
-                  <button disabled={busy()} onClick={() => action("clock-in")}>
-                    出勤
+          <div className="attendance-data" hidden={!data().attendance.available}>
+            <div className="worked">
+              <p>WORKED TODAY</p>
+              <strong>{/* @client */ duration(shownWorked())}</strong>
+              <small>/ {/* @client */ duration(data().attendance.targetSeconds)}</small>
+            </div>
+            <div className="balance">
+              <p>
+                DAY{" "}
+                <b>
+                  {/* @client */ duration(shownWorked() - data().attendance.targetSeconds, true)}
+                </b>
+              </p>
+              <p>
+                MONTH <b>{/* @client */ duration(data().attendance.monthDifference, true)}</b>
+              </p>
+            </div>
+            <div className="actions">
+              {data().attendance.state === "off" && (
+                <button disabled={busy()} onClick={() => action("clock-in")}>
+                  出勤
+                </button>
+              )}
+              {data().attendance.state === "working" && (
+                <>
+                  <button disabled={busy()} onClick={() => action("break-start")}>
+                    休憩
                   </button>
-                )}
-                {data().attendance.state === "working" && (
-                  <>
-                    <button disabled={busy()} onClick={() => action("break-start")}>
-                      休憩
-                    </button>
-                    <button disabled={busy()} onClick={() => action("clock-out")}>
-                      退勤
-                    </button>
-                  </>
-                )}
-                {data().attendance.state === "break" && (
-                  <>
-                    <button disabled={busy()} onClick={() => action("break-end")}>
-                      再開
-                    </button>
-                    <button disabled={busy()} onClick={() => action("clock-out")}>
-                      退勤
-                    </button>
-                  </>
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="empty attendance-empty">FLEX_TIMER_URL を設定すると表示されます</div>
-          )}
+                  <button disabled={busy()} onClick={() => action("clock-out")}>
+                    退勤
+                  </button>
+                </>
+              )}
+              {data().attendance.state === "break" && (
+                <>
+                  <button disabled={busy()} onClick={() => action("break-end")}>
+                    再開
+                  </button>
+                  <button disabled={busy()} onClick={() => action("clock-out")}>
+                    退勤
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="empty attendance-empty" hidden={data().attendance.available}>
+            FLEX_TIMER_URL を設定すると表示されます
+          </div>
         </article>
       </section>
 
@@ -525,6 +541,62 @@ export function Signage() {
           </footer>
         </section>
       )}
+
+      <section
+        className={`news-takeover attendance-takeover ${attendanceTakeover() && data().attendance.available ? "is-visible" : ""}`}
+        role="status"
+        aria-label="勤怠"
+        aria-hidden={!attendanceTakeover() || !data().attendance.available}
+      >
+        <header>
+          <p>
+            <i /> HOME SIGNAL / ATTENDANCE
+          </p>
+          <time>
+            {
+              /* @client */ now().toLocaleTimeString("ja-JP", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            }
+          </time>
+        </header>
+        <div className="news-takeover-title">
+          <p>FLEX TIME · CURRENT STATUS</p>
+          <h2>勤怠</h2>
+        </div>
+        <div className="attendance-takeover-content">
+          <div className="attendance-takeover-worked">
+            <p>WORKED TODAY</p>
+            <strong>{/* @client */ duration(shownWorked())}</strong>
+            <span>/ {/* @client */ duration(data().attendance.targetSeconds)}</span>
+          </div>
+          <dl>
+            <div>
+              <dt>STATUS</dt>
+              <dd>{/* @client */ stateLabel()}</dd>
+            </div>
+            <div>
+              <dt>DAY BALANCE</dt>
+              <dd>
+                {/* @client */ duration(shownWorked() - data().attendance.targetSeconds, true)}
+              </dd>
+            </div>
+            <div>
+              <dt>MONTH BALANCE</dt>
+              <dd>{/* @client */ duration(data().attendance.monthDifference, true)}</dd>
+            </div>
+            <div>
+              <dt>MONTH PROJECTION</dt>
+              <dd>{/* @client */ duration(data().attendance.projectedSeconds)}</dd>
+            </div>
+          </dl>
+        </div>
+        <footer>
+          <span>LIVE · 1秒ごとに更新</span>
+          <p>このあと通常画面へ戻ります</p>
+        </footer>
+      </section>
     </main>
   );
 }
