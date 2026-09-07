@@ -142,13 +142,12 @@ type SignageProps struct {
 	Now                 interface{}            `json:"-"`
 	AttendanceUpdatedAt interface{}            `json:"-"`
 	Busy                bool                   `json:"-"`
-	Error               string                 `json:"-"`
 	NewsTakeover        bool                   `json:"-"`
 	NewsPage            int                    `json:"-"`
 	ScheduleTakeover    bool                   `json:"-"`
 	SchedulePage        int                    `json:"-"`
 	AttendanceTakeover  bool                   `json:"-"`
-	BurnInGuardSlot124  BurnInGuardProps       `json:"-"`
+	BurnInGuardSlot121  BurnInGuardProps       `json:"-"`
 }
 
 // NewBurnInGuardProps creates BurnInGuardProps from BurnInGuardInput.
@@ -187,16 +186,15 @@ func NewSignageProps(in SignageInput) SignageProps {
 		Now:                 nil,
 		AttendanceUpdatedAt: nil,
 		Busy:                false,
-		Error:               "",
 		NewsTakeover:        false,
 		NewsPage:            0,
 		ScheduleTakeover:    false,
 		SchedulePage:        0,
 		AttendanceTakeover:  false,
-		BurnInGuardSlot124: NewBurnInGuardProps(BurnInGuardInput{
-			ScopeID:  scopeID + "_s124",
+		BurnInGuardSlot121: NewBurnInGuardProps(BurnInGuardInput{
+			ScopeID:  scopeID + "_s121",
 			BfParent: scopeID,
-			BfMount:  "s124",
+			BfMount:  "s121",
 		}),
 	}
 }

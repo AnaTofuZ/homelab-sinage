@@ -112,7 +112,6 @@ export function Signage() {
   const [now, setNow] = createSignal(new Date());
   const [attendanceUpdatedAt, setAttendanceUpdatedAt] = createSignal(Date.now());
   const [busy, setBusy] = createSignal(false);
-  const [error, setError] = createSignal("");
   const [newsTakeover, setNewsTakeover] = createSignal(false);
   const [newsPage, setNewsPage] = createSignal(0);
   const [scheduleTakeover, setScheduleTakeover] = createSignal(false);
@@ -126,9 +125,8 @@ export function Signage() {
       const body = await response.json();
       setAttendanceUpdatedAt(Date.parse(body.generatedAt));
       setData(body);
-      setError("");
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "更新できません");
+      console.error(reason);
     }
   };
 
@@ -140,9 +138,8 @@ export function Signage() {
       if (!response.ok) throw new Error(body.error ?? `HTTP ${response.status}`);
       setAttendanceUpdatedAt(Date.now());
       setData({ ...data(), attendance: body });
-      setError("");
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "操作できません");
+      console.error(reason);
     } finally {
       setBusy(false);
     }
@@ -223,14 +220,6 @@ export function Signage() {
   return (
     <main className={`signage ${data().alerts.length ? "has-weather-alert" : ""}`}>
       <div className="scanline" aria-hidden="true" />
-      <header className="topbar">
-        <p className="brand">
-          <i /> HOME SIGNAL <span>甲府 / PRIVATE NETWORK</span>
-        </p>
-        <p className="system">
-          {error() ? `DEGRADED · ${error()}` : "SYSTEM NORMAL"} <b />
-        </p>
-      </header>
 
       {data().alerts.length > 0 && (
         <aside className={`weather-alert ${alertLevel()}`} role="alert">
@@ -457,21 +446,15 @@ export function Signage() {
 
       {newsTakeover() && data().news.length > 0 && (
         <section className="news-takeover" role="status" aria-label="ニュース">
-          <header>
+          <div className="news-takeover-title">
             <p>
-              <i /> HOME SIGNAL / NEWS
-            </p>
-            <time>
               {
                 /* @client */ now().toLocaleTimeString("ja-JP", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })
               }
-            </time>
-          </header>
-          <div className="news-takeover-title">
-            <p>INFORMATION DISPLAY · KOFU</p>
+            </p>
             <h2>ニュース</h2>
           </div>
           <ol>
@@ -494,28 +477,21 @@ export function Signage() {
               {String(Math.ceil(data().news.length / 3)).padStart(2, "0")} · 更新{" "}
               {data().generatedAt.slice(11, 16)}
             </span>
-            <p>このあと通常画面へ戻ります</p>
           </footer>
         </section>
       )}
 
       {scheduleTakeover() && data().events.length > 0 && (
         <section className="news-takeover schedule-takeover" role="status" aria-label="予定">
-          <header>
+          <div className="news-takeover-title">
             <p>
-              <i /> HOME SIGNAL / SCHEDULE
-            </p>
-            <time>
               {
                 /* @client */ now().toLocaleTimeString("ja-JP", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })
               }
-            </time>
-          </header>
-          <div className="news-takeover-title">
-            <p>TODAY / TOMORROW · KOFU</p>
+            </p>
             <h2>予定</h2>
           </div>
           <ol>
@@ -538,7 +514,6 @@ export function Signage() {
               {String(Math.ceil(data().events.length / 4)).padStart(2, "0")} · 更新{" "}
               {data().generatedAt.slice(11, 16)}
             </span>
-            <p>このあと通常画面へ戻ります</p>
           </footer>
         </section>
       )}
@@ -549,21 +524,15 @@ export function Signage() {
         aria-label="勤怠"
         aria-hidden={!attendanceTakeover() || !data().attendance.available}
       >
-        <header>
+        <div className="news-takeover-title">
           <p>
-            <i /> HOME SIGNAL / ATTENDANCE
-          </p>
-          <time>
             {
               /* @client */ now().toLocaleTimeString("ja-JP", {
                 hour: "2-digit",
                 minute: "2-digit",
               })
             }
-          </time>
-        </header>
-        <div className="news-takeover-title">
-          <p>FLEX TIME · CURRENT STATUS</p>
+          </p>
           <h2>勤怠</h2>
         </div>
         <div className="attendance-takeover-content">
@@ -595,7 +564,6 @@ export function Signage() {
         </div>
         <footer>
           <span>LIVE · 1秒ごとに更新</span>
-          <p>このあと通常画面へ戻ります</p>
         </footer>
       </section>
 

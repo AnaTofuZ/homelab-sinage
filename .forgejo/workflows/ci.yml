@@ -72,3 +72,5 @@ jobs:
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
             homelab-signage-deploy@192.168.10.11
+          curl --fail --silent --show-error --max-time 10 http://192.168.10.118:8080/api/clearCache
+          curl --fail --silent --show-error --max-time 10 http://192.168.10.118:8080/api/reload
