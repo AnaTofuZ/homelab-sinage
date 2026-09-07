@@ -1,6 +1,7 @@
 "use client";
 
 import { createSignal, onCleanup, onMount } from "@barefootjs/client";
+import { BurnInGuard } from "./BurnInGuard";
 
 type Weather = {
   place: string;
@@ -597,6 +598,8 @@ export function Signage() {
           <p>このあと通常画面へ戻ります</p>
         </footer>
       </section>
+
+      <BurnInGuard />
     </main>
   );
 }

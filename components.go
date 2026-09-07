@@ -17,6 +17,26 @@ func randomID(n int) string {
 	return string(b)
 }
 
+// BurnInGuardInput is the user-facing input type.
+type BurnInGuardInput struct {
+	ScopeID  string // Optional: if empty, random ID is generated
+	BfParent string // Optional: parent scope id
+	BfMount  string // Optional: slot id in parent
+}
+
+// BurnInGuardProps is the props type for the BurnInGuard component.
+type BurnInGuardProps struct {
+	ScopeID       string                 `json:"-"`
+	BfIsRoot      bool                   `json:"-"`
+	BfIsChild     bool                   `json:"-"`
+	BfParent      string                 `json:"-"`
+	BfMount       string                 `json:"-"`
+	BfDataKey     string                 `json:"-"`
+	Scripts       *bf.ScriptCollector    `json:"-"`
+	BfCallerProps map[string]interface{} `json:"-"`
+	Visible       bool                   `json:"-"`
+}
+
 // Weather represents a weather.
 type Weather struct {
 	Place       string `json:"place"`
@@ -128,6 +148,25 @@ type SignageProps struct {
 	ScheduleTakeover    bool                   `json:"-"`
 	SchedulePage        int                    `json:"-"`
 	AttendanceTakeover  bool                   `json:"-"`
+	BurnInGuardSlot124  BurnInGuardProps       `json:"-"`
+}
+
+// NewBurnInGuardProps creates BurnInGuardProps from BurnInGuardInput.
+func NewBurnInGuardProps(in BurnInGuardInput) BurnInGuardProps {
+	scopeID := in.ScopeID
+	if scopeID == "" {
+		scopeID = "BurnInGuard_" + randomID(6)
+	}
+
+	bfCallerProps := map[string]interface{}{}
+
+	return BurnInGuardProps{
+		ScopeID:       scopeID,
+		BfParent:      in.BfParent,
+		BfMount:       in.BfMount,
+		BfCallerProps: bfCallerProps,
+		Visible:       false,
+	}
 }
 
 // NewSignageProps creates SignageProps from SignageInput.
@@ -154,5 +193,10 @@ func NewSignageProps(in SignageInput) SignageProps {
 		ScheduleTakeover:    false,
 		SchedulePage:        0,
 		AttendanceTakeover:  false,
+		BurnInGuardSlot124: NewBurnInGuardProps(BurnInGuardInput{
+			ScopeID:  scopeID + "_s124",
+			BfParent: scopeID,
+			BfMount:  "s124",
+		}),
 	}
 }
