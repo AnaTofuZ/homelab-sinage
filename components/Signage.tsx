@@ -31,7 +31,15 @@ type HourlyWeather = {
   wind: number;
 };
 type WeatherAlert = { level: string; title: string; detail: string };
-type Event = { id: string; title: string; time: string; location: string; allDay: boolean };
+type Event = {
+  id: string;
+  title: string;
+  time: string;
+  endTime: string;
+  day: "today" | "tomorrow";
+  location: string;
+  allDay: boolean;
+};
 type News = { title: string; url: string; published: string; summary: string };
 type Attendance = {
   available: boolean;
@@ -105,6 +113,8 @@ export function Signage() {
   const [error, setError] = createSignal("");
   const [newsTakeover, setNewsTakeover] = createSignal(false);
   const [newsPage, setNewsPage] = createSignal(0);
+  const [scheduleTakeover, setScheduleTakeover] = createSignal(false);
+  const [schedulePage, setSchedulePage] = createSignal(0);
 
   const reload = async () => {
     try {
@@ -138,7 +148,7 @@ export function Signage() {
     const refresh = window.setInterval(() => void reload(), 5 * 60 * 1000);
     let dismissNews = 0;
     const showNews = () => {
-      if (!data().news.length) return;
+      if (!data().news.length || scheduleTakeover()) return;
       setNewsTakeover(true);
       clearTimeout(dismissNews);
       dismissNews = window.setTimeout(() => {
@@ -149,12 +159,28 @@ export function Signage() {
     };
     const firstNews = window.setTimeout(showNews, 30 * 1000);
     const newsCycle = window.setInterval(showNews, 3 * 60 * 1000);
+    let dismissSchedule = 0;
+    const showSchedule = () => {
+      if (!data().events.length || newsTakeover()) return;
+      setScheduleTakeover(true);
+      clearTimeout(dismissSchedule);
+      dismissSchedule = window.setTimeout(() => {
+        setScheduleTakeover(false);
+        const pages = Math.ceil(data().events.length / 4);
+        setSchedulePage(pages ? (schedulePage() + 1) % pages : 0);
+      }, 24 * 1000);
+    };
+    const firstSchedule = window.setTimeout(showSchedule, 90 * 1000);
+    const scheduleCycle = window.setInterval(showSchedule, 3 * 60 * 1000);
     onCleanup(() => {
       clearInterval(clock);
       clearInterval(refresh);
       clearInterval(newsCycle);
+      clearInterval(scheduleCycle);
       clearTimeout(firstNews);
       clearTimeout(dismissNews);
+      clearTimeout(firstSchedule);
+      clearTimeout(dismissSchedule);
     });
   });
 
@@ -166,6 +192,9 @@ export function Signage() {
       ? Math.max(0, (Date.now() - Date.parse(data().generatedAt)) / 1000)
       : 0);
   const newsPageStart = () => (newsPage() % Math.ceil(data().news.length / 3)) * 3;
+  const schedulePageStart = () => (schedulePage() % Math.ceil(data().events.length / 4)) * 4;
+  const eventTime = (event: Event) =>
+    event.endTime ? event.time + "–" + event.endTime : event.time;
   const alertLevel = () =>
     data().alerts.some((alert) => alert.level === "emergency")
       ? "emergency"
@@ -282,22 +311,25 @@ export function Signage() {
             </div>
             <b>{String(data().events.length).padStart(2, "0")}</b>
           </header>
-          <ol>
-            {data().events.length ? (
-              data().events.map((event) => (
-                <li key={event.id}>
-                  <time>{event.time}</time>
+          {data().events.length ? (
+            <ol>
+              {data().events.map((event) => (
+                <li className={"schedule-" + event.day} key={event.id}>
+                  <time>
+                    <small>{event.day === "today" ? "今日" : "明日"}</small>
+                    {eventTime(event)}
+                  </time>
                   <i />
                   <div>
                     <strong>{event.title}</strong>
                     {event.location && <small>{event.location}</small>}
                   </div>
                 </li>
-              ))
-            ) : (
-              <li className="empty">直近の予定はありません</li>
-            )}
-          </ol>
+              ))}
+            </ol>
+          ) : (
+            <p className="empty">直近の予定はありません</p>
+          )}
         </article>
 
         <article className="forecast panel reveal">
@@ -443,6 +475,50 @@ export function Signage() {
             <span>
               {String(newsPageStart() / 3 + 1).padStart(2, "0")} /{" "}
               {String(Math.ceil(data().news.length / 3)).padStart(2, "0")} · 更新{" "}
+              {data().generatedAt.slice(11, 16)}
+            </span>
+            <p>このあと通常画面へ戻ります</p>
+          </footer>
+        </section>
+      )}
+
+      {scheduleTakeover() && data().events.length > 0 && (
+        <section className="news-takeover schedule-takeover" role="status" aria-label="予定">
+          <header>
+            <p>
+              <i /> HOME SIGNAL / SCHEDULE
+            </p>
+            <time>
+              {
+                /* @client */ now().toLocaleTimeString("ja-JP", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              }
+            </time>
+          </header>
+          <div className="news-takeover-title">
+            <p>TODAY / TOMORROW · KOFU</p>
+            <h2>予定</h2>
+          </div>
+          <ol>
+            {data()
+              .events.slice(schedulePageStart(), schedulePageStart() + 4)
+              .map((event) => (
+                <li key={event.id}>
+                  <b>{event.day === "today" ? "今日" : "明日"}</b>
+                  <div>
+                    <time>{eventTime(event)}</time>
+                    <strong>{event.title}</strong>
+                    <p>{event.location || "場所の指定なし"}</p>
+                  </div>
+                </li>
+              ))}
+          </ol>
+          <footer>
+            <span>
+              {String(schedulePageStart() / 4 + 1).padStart(2, "0")} /{" "}
+              {String(Math.ceil(data().events.length / 4)).padStart(2, "0")} · 更新{" "}
               {data().generatedAt.slice(11, 16)}
             </span>
             <p>このあと通常画面へ戻ります</p>

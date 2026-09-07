@@ -32,8 +32,8 @@ jobs:
         run: test -z "$(gofmt -l $(git ls-files '*.go'))"
       - name: Run golangci-lint with the target Go version
         run: |
-          GOBIN="$RUNNER_TEMP/bin" go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
-          "$RUNNER_TEMP/bin/golangci-lint" run --disable=staticcheck,unused ./...
+          GOBIN="$RUNNER_TEMP/bin" go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+          "$RUNNER_TEMP/bin/golangci-lint" run ./...
       - run: go test -race ./...
 
   nix:

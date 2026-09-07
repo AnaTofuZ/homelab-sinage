@@ -96,12 +96,20 @@ func upcomingCalendarEvents(calendar *ics.Calendar, now time.Time) []calendarEve
 		items = items[:12]
 	}
 	result := make([]calendarEvent, 0, len(items))
+	tomorrow := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, tokyo)
 	for _, item := range items {
-		label := "終日"
+		start, end := "終日", ""
 		if !item.AllDay {
-			label = item.Start.In(tokyo).Format("15:04")
+			start = item.Start.In(tokyo).Format("15:04")
+			if item.End.After(item.Start) {
+				end = item.End.In(tokyo).Format("15:04")
+			}
 		}
-		result = append(result, calendarEvent{ID: item.ID, Title: item.Title, Time: label, Location: item.Location, AllDay: item.AllDay})
+		day := "today"
+		if !item.Start.Before(tomorrow) {
+			day = "tomorrow"
+		}
+		result = append(result, calendarEvent{ID: item.ID, Title: item.Title, Time: start, EndTime: end, Day: day, Location: item.Location, AllDay: item.AllDay})
 	}
 	return result
 }
