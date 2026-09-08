@@ -8,8 +8,6 @@ on:
 jobs:
   code:
     runs-on: docker
-    container:
-      image: git.home.anatofuz.net/anatofuz/ci-base:20260909-act@sha256:7cf4a927287426d2a33e2246824ccdf77b066c7a61db8abf7d45135c3b14bf6f
     timeout-minutes: 20
     steps:
       - uses: https://data.forgejo.org/actions/checkout@v6
@@ -77,8 +75,6 @@ jobs:
 
   nix:
     runs-on: docker
-    container:
-      image: git.home.anatofuz.net/anatofuz/ci-base:20260909-act@sha256:7cf4a927287426d2a33e2246824ccdf77b066c7a61db8abf7d45135c3b14bf6f
     timeout-minutes: 20
     steps:
       - uses: https://data.forgejo.org/actions/checkout@v6
