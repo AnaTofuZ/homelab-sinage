@@ -17,14 +17,14 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run lint:go && npm test && npm run build"
   },
   "dependencies": {
-    "@barefootjs/client": "^0.34.0",
-    "@barefootjs/go-template": "^0.34.0",
-    "@barefootjs/jsx": "^0.34.0",
-    "@barefootjs/shared": "^0.34.0"
+    "@barefootjs/client": "^0.35.0",
+    "@barefootjs/go-template": "^0.35.0",
+    "@barefootjs/jsx": "^0.35.0",
+    "@barefootjs/shared": "^0.35.0"
   },
   "devDependencies": {
-    "@barefootjs/cli": "^0.34.0",
-    "@barefootjs/vite": "^0.34.0",
+    "@barefootjs/cli": "^0.35.0",
+    "@barefootjs/vite": "^0.35.0",
     "@types/node": "^22.0.0",
     "concurrently": "^9.0.0",
     "oxfmt": "^0.66.0",
