@@ -3,6 +3,7 @@ name: Update Nix dependency hashes
 on:
   push:
     paths:
+      - flake.lock
       - go.mod
       - go.sum
       - package-lock.json

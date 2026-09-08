@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "go-overlay": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788835781,
+        "narHash": "sha256-IphemL5tEj9aHx3kPcnTmY9RurcGB+dGR/UpSgGeZQs=",
+        "ref": "main",
+        "rev": "bcc6e5d3415e0bb74dbe0973d02e3874ef5dd584",
+        "revCount": 361,
+        "type": "git",
+        "url": "https://github.com/purpleclay/go-overlay"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/purpleclay/go-overlay"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1788549839,
@@ -18,6 +35,7 @@
     },
     "root": {
       "inputs": {
+        "go-overlay": "go-overlay",
         "nixpkgs": "nixpkgs"
       }
     }
