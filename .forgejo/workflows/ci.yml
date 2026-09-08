@@ -11,17 +11,16 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: https://data.forgejo.org/actions/checkout@v6
-      - name: Install sudo
+      - name: Configure Nix GitHub authentication
+        env:
+          NIX_GITHUB_TOKEN: ${{ secrets.NIX_GITHUB_TOKEN }}
         run: |
-          apt-get update
-          apt-get install --yes sudo
-      - uses: https://github.com/cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.NIX_GITHUB_TOKEN }}
-          extra_nix_config: |
-            fallback = true
-            extra-substituters = https://nix-cache.home.anatofuz.net/shirane
-            extra-trusted-public-keys = shirane-1:no8MT22B4VtEfZqtfOw49lYO2knMmA5F1xwDoixyEms=
+          umask 077
+          : > "$RUNNER_TEMP/nix-user.conf"
+          if [ -n "$NIX_GITHUB_TOKEN" ]; then
+            printf 'access-tokens = github.com=%s\n' "$NIX_GITHUB_TOKEN" > "$RUNNER_TEMP/nix-user.conf"
+          fi
+          echo "NIX_USER_CONF_FILES=$RUNNER_TEMP/nix-user.conf" >> "$GITHUB_ENV"
       - name: Publish Nix build results to shared cache
         continue-on-error: true
         if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
@@ -38,6 +37,23 @@ jobs:
           nix build .#golangci-lint --out-link "$RUNNER_TEMP/golangci-lint"
           echo "$RUNNER_TEMP/go/bin" >> "$GITHUB_PATH"
           echo "$RUNNER_TEMP/golangci-lint/bin" >> "$GITHUB_PATH"
+      - name: Locate Go caches
+        id: go-cache
+        run: |
+          echo "modules=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+          echo "build=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
+          echo "version=$(go env GOVERSION)" >> "$GITHUB_OUTPUT"
+      - name: Cache Go dependencies and compilation
+        uses: https://data.forgejo.org/actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: |
+            ${{ steps.go-cache.outputs.modules }}
+            ${{ steps.go-cache.outputs.build }}
+          key: go-${{ runner.os }}-${{ runner.arch }}-${{ steps.go-cache.outputs.version }}-${{ hashFiles('**/go.sum', '**/go.mod') }}-${{ forgejo.sha }}
+          restore-keys: |
+            go-${{ runner.os }}-${{ runner.arch }}-${{ steps.go-cache.outputs.version }}-${{ hashFiles('**/go.sum', '**/go.mod') }}-
+            go-${{ runner.os }}-${{ runner.arch }}-${{ steps.go-cache.outputs.version }}-
+
       - uses: https://data.forgejo.org/actions/setup-node@v6
         with:
           node-version: 22
@@ -62,17 +78,16 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: https://data.forgejo.org/actions/checkout@v6
-      - name: Install sudo
+      - name: Configure Nix GitHub authentication
+        env:
+          NIX_GITHUB_TOKEN: ${{ secrets.NIX_GITHUB_TOKEN }}
         run: |
-          apt-get update
-          apt-get install --yes sudo
-      - uses: https://github.com/cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.NIX_GITHUB_TOKEN }}
-          extra_nix_config: |
-            fallback = true
-            extra-substituters = https://nix-cache.home.anatofuz.net/shirane
-            extra-trusted-public-keys = shirane-1:no8MT22B4VtEfZqtfOw49lYO2knMmA5F1xwDoixyEms=
+          umask 077
+          : > "$RUNNER_TEMP/nix-user.conf"
+          if [ -n "$NIX_GITHUB_TOKEN" ]; then
+            printf 'access-tokens = github.com=%s\n' "$NIX_GITHUB_TOKEN" > "$RUNNER_TEMP/nix-user.conf"
+          fi
+          echo "NIX_USER_CONF_FILES=$RUNNER_TEMP/nix-user.conf" >> "$GITHUB_ENV"
       - name: Publish Nix build results to shared cache
         continue-on-error: true
         if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
@@ -84,7 +99,7 @@ jobs:
           token: ${{ secrets.ATTIC_TOKEN }}
           inputs-from: .
       - run: nix fmt -- --ci
-      - run: nix run nixpkgs#statix -- check .
+      - run: nix run --inputs-from . nixpkgs#statix -- check .
       - run: nix flake check --no-build --all-systems
 
   deploy:
