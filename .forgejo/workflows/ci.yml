@@ -16,6 +16,8 @@ jobs:
           apt-get update
           apt-get install --yes sudo
       - uses: https://github.com/cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.NIX_GITHUB_TOKEN }}
       - name: Set up locked Go and golangci-lint
         run: |
           nix build .#go --out-link "$RUNNER_TEMP/go"
@@ -51,6 +53,8 @@ jobs:
           apt-get update
           apt-get install --yes sudo
       - uses: https://github.com/cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.NIX_GITHUB_TOKEN }}
       - run: nix fmt -- --ci
       - run: nix run nixpkgs#statix -- check .
       - run: nix flake check --no-build --all-systems
