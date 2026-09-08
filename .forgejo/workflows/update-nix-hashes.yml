@@ -30,6 +30,8 @@ jobs:
           apt-get update
           apt-get install --yes sudo
       - uses: https://github.com/cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.NIX_GITHUB_TOKEN }}
       - run: ./scripts/update-nix-hashes.sh
       - name: Commit and push
         run: |
