@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	_ "time/tzdata" // Keep IANA zones available in isolated Nix builds and deployments.
 
 	"golang.org/x/sync/errgroup"
 )

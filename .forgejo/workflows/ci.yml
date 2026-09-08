@@ -18,6 +18,20 @@ jobs:
       - uses: https://github.com/cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.NIX_GITHUB_TOKEN }}
+          extra_nix_config: |
+            fallback = true
+            extra-substituters = https://nix-cache.home.anatofuz.net/shirane
+            extra-trusted-public-keys = shirane-1:no8MT22B4VtEfZqtfOw49lYO2knMmA5F1xwDoixyEms=
+      - name: Publish Nix build results to shared cache
+        continue-on-error: true
+        if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
+        uses: https://github.com/ryanccn/attic-action@5635a15ef0c5462194ffbd05d1daeddc74625c3a # v0
+        with:
+          endpoint: https://nix-cache.home.anatofuz.net/
+          cache: shirane
+          skip-use: "true"
+          token: ${{ secrets.ATTIC_TOKEN }}
+          inputs-from: .
       - name: Set up locked Go and golangci-lint
         run: |
           nix build .#go --out-link "$RUNNER_TEMP/go"
@@ -55,6 +69,20 @@ jobs:
       - uses: https://github.com/cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.NIX_GITHUB_TOKEN }}
+          extra_nix_config: |
+            fallback = true
+            extra-substituters = https://nix-cache.home.anatofuz.net/shirane
+            extra-trusted-public-keys = shirane-1:no8MT22B4VtEfZqtfOw49lYO2knMmA5F1xwDoixyEms=
+      - name: Publish Nix build results to shared cache
+        continue-on-error: true
+        if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
+        uses: https://github.com/ryanccn/attic-action@5635a15ef0c5462194ffbd05d1daeddc74625c3a # v0
+        with:
+          endpoint: https://nix-cache.home.anatofuz.net/
+          cache: shirane
+          skip-use: "true"
+          token: ${{ secrets.ATTIC_TOKEN }}
+          inputs-from: .
       - run: nix fmt -- --ci
       - run: nix run nixpkgs#statix -- check .
       - run: nix flake check --no-build --all-systems
