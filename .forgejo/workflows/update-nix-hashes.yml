@@ -20,22 +20,20 @@ concurrency:
 jobs:
   update:
     runs-on: docker
+    container:
+      image: git.home.anatofuz.net/anatofuz/ci-base:20260909-act@sha256:7cf4a927287426d2a33e2246824ccdf77b066c7a61db8abf7d45135c3b14bf6f
     timeout-minutes: 15
     steps:
       - uses: https://data.forgejo.org/actions/checkout@v6
         with:
           ref: ${{ forgejo.ref_name }}
-      - name: Install sudo
+      - name: Configure Nix GitHub authentication
+        env:
+          NIX_GITHUB_TOKEN: ${{ secrets.NIX_GITHUB_TOKEN }}
         run: |
-          apt-get update
-          apt-get install --yes sudo
-      - uses: https://github.com/cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.NIX_GITHUB_TOKEN }}
-          extra_nix_config: |
-            fallback = true
-            extra-substituters = https://nix-cache.home.anatofuz.net/shirane
-            extra-trusted-public-keys = shirane-1:no8MT22B4VtEfZqtfOw49lYO2knMmA5F1xwDoixyEms=
+          umask 077
+          printf 'access-tokens = github.com=%s\n' "$NIX_GITHUB_TOKEN" > "$RUNNER_TEMP/nix-user.conf"
+          echo "NIX_USER_CONF_FILES=$RUNNER_TEMP/nix-user.conf" >> "$GITHUB_ENV"
       - name: Publish Nix build results to shared cache
         continue-on-error: true
         if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
