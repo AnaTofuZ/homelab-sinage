@@ -42,7 +42,7 @@ npm run format
 npm run check
 ```
 
-Forgejo ActionsではTypeScript/HTMLをNode.js、Goをsetup-goとgolangci-lintで直接検査します。Nix環境はNix式の検査と `npmDepsHash` / `vendorHash` の自動更新だけに使用します。mainへのpush時は `DEPLOY_SSH_KEY` が設定済みなら `homelab-signage-deploy@192.168.10.11` を呼び出します。
+Forgejo ActionsではTypeScript/HTMLをNode.js、GoをNixで固定したGoとgolangci-lintで検査します。Nix環境はNix式の検査と `npmDepsHash` / `vendorHash` の自動更新にも使用します。mainへのpush時は `DEPLOY_SSH_KEY` が設定済みなら `homelab-signage-deploy@192.168.10.11` を呼び出します。
 
 Tab M8 は Chrome の「ホーム画面に追加」またはキオスクブラウザで横向き表示を想定しています。縦向きレイアウトと `prefers-reduced-motion` にも対応しています。
 
@@ -76,3 +76,7 @@ The `bf` CLI is the first reference for component APIs and framework docs — ru
 ## Generated output
 
 The compiled output directory (produced by `vite build`) is regenerated on every build — don't edit it by hand.
+
+## Go toolchain
+
+Nixビルド・開発環境・Forgejo CIは、`go-overlay` の最新安定版Goと、同じGoでビルドした最新の `golangci-lint` を使用します。バージョンは `flake.lock` に固定され、`nix flake update go-overlay` で更新できます。

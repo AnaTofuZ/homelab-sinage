@@ -2,9 +2,18 @@
   description = "Home Signal — Go + BarefootJS household signage";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  inputs.go-overlay = {
+    url = "git+https://github.com/purpleclay/go-overlay?ref=main";
+    flake = false;
+  };
 
   outputs =
-    { self, nixpkgs, ... }:
+    {
+      self,
+      nixpkgs,
+      go-overlay,
+      ...
+    }:
     let
       systems = [
         "x86_64-linux"
@@ -17,6 +26,7 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          go = (pkgs.extend (import go-overlay)).go-bin.latestStable;
           src = pkgs.lib.cleanSourceWith {
             src = ./.;
             filter =
@@ -48,14 +58,16 @@
           };
         in
         {
-          default = pkgs.buildGo127Module {
+          inherit go;
+          golangci-lint = go.tools.golangci-lint.latest;
+          default = (pkgs.buildGoModule.override { inherit go; }) {
             pname = "homelab-signage";
             version = "0.1.0";
             inherit src;
-            vendorHash = "sha256-US6OBsxN7jAxfC3z3kJCH3sxeGbEQQXalFeHul14Zkk=";
+            vendorHash = "sha256-8ZiJj/VPnJpCnEQgkd9xQprGrbGx0a6lmUjubvQKiE0=";
             subPackages = [ "." ];
             nativeBuildInputs = [ pkgs.makeWrapper ];
-            nativeCheckInputs = [ pkgs.golangci-lint ];
+            nativeCheckInputs = [ self.packages.${system}.golangci-lint ];
             preBuild = ''
               cp -r ${frontend}/dist .
               cp ${frontend}/components.go .
@@ -90,8 +102,8 @@
         {
           default = pkgs.mkShell {
             packages = [
-              pkgs.go_1_27
-              pkgs.golangci-lint
+              self.packages.${system}.go
+              self.packages.${system}.golangci-lint
               pkgs.nodejs_22
             ];
             shellHook = ''
