@@ -44,7 +44,7 @@
             pname = "homelab-signage-ui";
             version = "0.1.0";
             inherit src;
-            npmDepsHash = "sha256-mByRR8egx6T7r50j/Otk1YdhgioDjs+jrdWcak5dD3o=";
+            npmDepsHash = "sha256-sjVm7NjolcBeMXu1KA9VbpBHDIBzb6+U6wm5A3oYJuM=";
             npmBuildScript = "build:ui";
             doCheck = true;
             checkPhase = ''
