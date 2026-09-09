@@ -48,7 +48,7 @@ jobs:
           echo "build=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
           echo "version=$(go env GOVERSION)" >> "$GITHUB_OUTPUT"
       - name: Cache Go dependencies and compilation
-        uses: https://data.forgejo.org/actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: https://data.forgejo.org/actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ${{ steps.go-cache.outputs.modules }}
