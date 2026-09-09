@@ -2,6 +2,7 @@ name: Update Nix dependency hashes
 
 on:
   push:
+    branches: [master]
     paths:
       - go.mod
       - go.sum
