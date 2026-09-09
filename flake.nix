@@ -44,7 +44,7 @@
             pname = "homelab-signage-ui";
             version = "0.1.0";
             inherit src;
-            npmDepsHash = "sha256-J8kYQD3lp49JxGoEvj+f//+X2eZXSPF8+WnBCbGOMI8=";
+            npmDepsHash = "sha256-mByRR8egx6T7r50j/Otk1YdhgioDjs+jrdWcak5dD3o=";
             npmBuildScript = "build:ui";
             doCheck = true;
             checkPhase = ''
@@ -64,7 +64,7 @@
             pname = "homelab-signage";
             version = "0.1.0";
             inherit src;
-            vendorHash = "sha256-8ZiJj/VPnJpCnEQgkd9xQprGrbGx0a6lmUjubvQKiE0=";
+            vendorHash = "sha256-3UBKMXOOgRu8fZ65/ppTuneI8Q/ANeyZ/WmUmtkZpGo=";
             subPackages = [ "." ];
             nativeBuildInputs = [ pkgs.makeWrapper ];
             nativeCheckInputs = [ self.packages.${system}.golangci-lint ];
