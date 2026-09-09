@@ -92,6 +92,7 @@ jobs:
             printf 'access-tokens = github.com=%s\n' "$NIX_GITHUB_TOKEN" > "$RUNNER_TEMP/nix-user.conf"
           fi
           echo "NIX_USER_CONF_FILES=$RUNNER_TEMP/nix-user.conf" >> "$GITHUB_ENV"
+      - uses: https://git.home.anatofuz.net/anatofuz/forgejo-actions/update-nix-hashes@main
       - name: Publish Nix build results to shared cache
         continue-on-error: true
         if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
