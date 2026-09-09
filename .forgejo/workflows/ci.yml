@@ -5,6 +5,10 @@ on:
     branches: [master]
   pull_request:
 
+concurrency:
+  group: homelab-signage-${{ forgejo.ref }}
+  cancel-in-progress: true
+
 jobs:
   code:
     runs-on: docker

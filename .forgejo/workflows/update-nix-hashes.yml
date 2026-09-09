@@ -3,11 +3,9 @@ name: Update Nix dependency hashes
 on:
   push:
     paths:
-      - flake.lock
       - go.mod
       - go.sum
       - package-lock.json
-      - scripts/update-nix-hashes.sh
       - .forgejo/workflows/update-nix-hashes.yml
 
 permissions:
@@ -19,40 +17,5 @@ concurrency:
 
 jobs:
   update:
-    runs-on: docker
-    timeout-minutes: 15
-    steps:
-      - uses: https://data.forgejo.org/actions/checkout@v6
-        with:
-          ref: ${{ forgejo.ref_name }}
-      - name: Configure Nix GitHub authentication
-        env:
-          NIX_GITHUB_TOKEN: ${{ secrets.NIX_GITHUB_TOKEN }}
-        run: |
-          umask 077
-          : > "$RUNNER_TEMP/nix-user.conf"
-          if [ -n "$NIX_GITHUB_TOKEN" ]; then
-            printf 'access-tokens = github.com=%s\n' "$NIX_GITHUB_TOKEN" > "$RUNNER_TEMP/nix-user.conf"
-          fi
-          echo "NIX_USER_CONF_FILES=$RUNNER_TEMP/nix-user.conf" >> "$GITHUB_ENV"
-      - name: Publish Nix build results to shared cache
-        continue-on-error: true
-        if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
-        uses: https://github.com/ryanccn/attic-action@5635a15ef0c5462194ffbd05d1daeddc74625c3a # v0
-        with:
-          endpoint: https://nix-cache.home.anatofuz.net/
-          cache: shirane
-          skip-use: "true"
-          token: ${{ secrets.ATTIC_TOKEN }}
-          inputs-from: .
-      - run: ./scripts/update-nix-hashes.sh
-      - name: Commit and push
-        run: |
-          if git diff --quiet -- flake.nix; then
-            exit 0
-          fi
-          git config user.name "forgejo-actions[bot]"
-          git config user.email "forgejo-actions[bot]@users.noreply.local"
-          git add flake.nix
-          git commit -m "fix: update Nix dependency hashes"
-          git push
+    uses: anatofuz/forgejo-actions/.forgejo/workflows/update-nix-hashes.yml@main
+    secrets: inherit
