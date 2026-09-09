@@ -5,7 +5,6 @@ on:
     paths:
       - go.mod
       - go.sum
-      - package-lock.json
       - .forgejo/workflows/update-nix-hashes.yml
 
 permissions:
