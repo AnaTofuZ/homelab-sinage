@@ -213,9 +213,11 @@ export function Signage() {
   const alertLevel = () =>
     data().alerts.some((alert) => alert.level === "emergency")
       ? "emergency"
-      : data().alerts.some((alert) => alert.level === "warning")
-        ? "warning"
-        : "advisory";
+      : data().alerts.some((alert) => alert.level === "danger")
+        ? "danger"
+        : data().alerts.some((alert) => alert.level === "warning")
+          ? "warning"
+          : "advisory";
 
   return (
     <main className={`signage ${data().alerts.length ? "has-weather-alert" : ""}`}>

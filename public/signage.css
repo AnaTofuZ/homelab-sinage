@@ -69,16 +69,21 @@ button {
   gap: 22px;
   padding: 0 18px;
   color: #120e07;
-  background: #ffbd2e;
+  background: #f2e700;
   overflow: hidden;
   animation: alert-in 0.45s both;
 }
-.weather-alert.warning,
-.weather-alert.emergency {
+.weather-alert.warning {
   color: #fff;
-  background: #dc2f2f;
+  background: #ff2800;
+}
+.weather-alert.danger {
+  color: #fff;
+  background: #aa00aa;
 }
 .weather-alert.emergency {
+  color: #fff;
+  background: repeating-linear-gradient(135deg, #700070 0 12px, #380038 12px 24px);
   animation:
     alert-in 0.45s both,
     alert-pulse 1.4s infinite;

@@ -20,7 +20,7 @@ func TestWeatherLabel(t *testing.T) {
 
 func TestParseWeatherAlertsForKofu(t *testing.T) {
 	const body = `[
-		{"headlineText":"雷に注意してください。","warning":{"class20Items":[{"areaCode":"1920100","kinds":[{"code":"14","status":"発表"}]}]}},
+		{"headlineText":"土砂災害に注意してください。","warning":{"class20Items":[{"areaCode":"1920100","kinds":[{"code":"29","status":"発表"}]}]}},
 		{"headlineText":"解除します。","warning":{"class20Items":[{"areaCode":"1920100","kinds":[{"code":"15","status":"解除"}]}]}},
 		{"headlineText":"別の地域です。","warning":{"class20Items":[{"areaCode":"1920200","kinds":[{"code":"03","status":"発表"}]}]}}
 	]`
@@ -29,8 +29,16 @@ func TestParseWeatherAlertsForKofu(t *testing.T) {
 		t.Fatal(err)
 	}
 	alerts := parseWeatherAlerts(reports)
-	if len(alerts) != 1 || alerts[0].Title != "雷注意報" || alerts[0].Level != "advisory" || alerts[0].Detail != "雷に注意してください。" {
+	if len(alerts) != 1 || alerts[0].Title != "土砂災害注意報" || alerts[0].Level != "advisory" || alerts[0].Detail != "土砂災害に注意してください。" {
 		t.Fatalf("unexpected alerts: %#v", alerts)
+	}
+}
+
+func TestWeatherAlertKindLevels(t *testing.T) {
+	for code, want := range map[string]string{"29": "advisory", "09": "warning", "49": "danger", "39": "emergency"} {
+		if _, got := weatherAlertKind(code); got != want {
+			t.Errorf("weatherAlertKind(%q) level = %q, want %q", code, got, want)
+		}
 	}
 }
 
