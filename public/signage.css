@@ -56,6 +56,21 @@ button {
   opacity: 0.08;
   background: repeating-linear-gradient(to bottom, transparent 0 3px, #fff 4px);
 }
+.sound-enable {
+  position: fixed;
+  z-index: 7;
+  top: 6px;
+  right: 20px;
+  padding: 5px 9px;
+  border: 1px solid var(--acid);
+  color: var(--acid);
+  background: #090b0de6;
+  font:
+    700 8px ui-monospace,
+    monospace;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
 .panel {
   border: 1px solid #33383b;
   background: rgba(14, 17, 19, 0.88);
@@ -810,6 +825,97 @@ button {
     400 clamp(20px, 3vw, 36px) ui-monospace,
     monospace;
 }
+.event-alert {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  padding: 22px;
+  overflow: hidden;
+  color: #fff;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 20px, #ffed0026 20px 22px),
+    radial-gradient(circle, #d30000 0 22%, #380000 58%, #080000 100%);
+  text-align: center;
+  animation: event-alert-stage 18s both;
+}
+.event-alert::before,
+.event-alert::after {
+  content: "EMERGENCY SCHEDULE";
+  position: absolute;
+  inset-inline: 0;
+  padding: 6px;
+  color: #160000;
+  background: #ffed00;
+  font:
+    900 clamp(10px, 1.8vw, 18px) ui-monospace,
+    monospace;
+  letter-spacing: 0.42em;
+  animation: event-alert-strip 0.28s steps(2) infinite;
+}
+.event-alert::before {
+  top: 7%;
+}
+.event-alert::after {
+  top: auto;
+  bottom: 7%;
+}
+.event-alert-rays {
+  position: absolute;
+  width: 130vmax;
+  aspect-ratio: 1;
+  background: repeating-conic-gradient(#ffed0038 0 4deg, transparent 4deg 12deg);
+  animation: event-alert-spin 5s linear infinite;
+}
+.event-alert-kicker,
+.event-alert-time,
+.event-alert h2,
+.event-alert-location,
+.event-alert > strong {
+  z-index: 1;
+  margin: 0;
+  text-shadow:
+    0 3px 0 #000,
+    0 0 22px #ffed00;
+}
+.event-alert-kicker {
+  color: #ffed00;
+  font:
+    900 clamp(11px, 2vw, 20px) ui-monospace,
+    monospace;
+  letter-spacing: 0.45em;
+}
+.event-alert-time {
+  font:
+    900 clamp(70px, 18vw, 180px) ui-monospace,
+    monospace;
+  line-height: 0.95;
+  letter-spacing: -0.08em;
+  animation: event-alert-punch 0.7s steps(2) infinite;
+}
+.event-alert h2 {
+  max-width: min(90vw, 980px);
+  overflow: hidden;
+  font-size: clamp(28px, 6vw, 68px);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.event-alert-location {
+  margin-top: 8px;
+  font-size: clamp(13px, 2vw, 22px);
+}
+.event-alert > strong {
+  margin-top: 12px;
+  padding: 3px 24px;
+  color: #230000;
+  background: #ffed00;
+  font-size: clamp(20px, 4vw, 44px);
+  letter-spacing: 0.3em;
+  text-shadow: none;
+}
 .burnin-guard {
   position: fixed;
   z-index: 20;
@@ -1039,6 +1145,39 @@ button {
   from {
     opacity: 0;
     transform: translateX(45px);
+  }
+}
+@keyframes event-alert-stage {
+  0% {
+    opacity: 0;
+    filter: brightness(4);
+    transform: scale(1.25);
+  }
+  3%,
+  92% {
+    opacity: 1;
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes event-alert-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes event-alert-punch {
+  50% {
+    color: #ffed00;
+    transform: scale(1.06);
+  }
+}
+@keyframes event-alert-strip {
+  50% {
+    color: #ffed00;
+    background: #d00000;
   }
 }
 @keyframes burnin-stage {

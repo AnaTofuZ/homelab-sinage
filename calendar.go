@@ -109,7 +109,7 @@ func upcomingCalendarEvents(calendar *ics.Calendar, now time.Time) []calendarEve
 		if !item.Start.Before(tomorrow) {
 			day = "tomorrow"
 		}
-		result = append(result, calendarEvent{ID: item.ID, Title: item.Title, Time: start, EndTime: end, Day: day, Location: item.Location, AllDay: item.AllDay})
+		result = append(result, calendarEvent{ID: item.ID, Title: item.Title, StartsAt: item.Start.In(tokyo).Format(time.RFC3339), Time: start, EndTime: end, Day: day, Location: item.Location, AllDay: item.AllDay})
 	}
 	return result
 }

@@ -71,6 +71,7 @@ type forecastDay struct {
 type calendarEvent struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
+	StartsAt string `json:"startsAt"`
 	Time     string `json:"time"`
 	EndTime  string `json:"endTime"`
 	Day      string `json:"day"`
