@@ -35,6 +35,7 @@ type WeatherAlert = { level: string; title: string; detail: string };
 type Event = {
   id: string;
   title: string;
+  startsAt: string;
   time: string;
   endTime: string;
   day: "today" | "tomorrow";
@@ -117,6 +118,36 @@ export function Signage() {
   const [scheduleTakeover, setScheduleTakeover] = createSignal(false);
   const [schedulePage, setSchedulePage] = createSignal(0);
   const [attendanceTakeover, setAttendanceTakeover] = createSignal(false);
+  const [eventAlert, setEventAlert] = createSignal<Event | null>(null);
+  const [soundReady, setSoundReady] = createSignal(false);
+  let audioContext: AudioContext | null = null;
+
+  const enableSound = async () => {
+    audioContext ??= new AudioContext();
+    await audioContext.resume();
+    setSoundReady(audioContext.state === "running");
+  };
+
+  const playJackpotAlert = () => {
+    if (!audioContext || audioContext.state !== "running") return;
+    const started = audioContext.currentTime;
+    [0, 0.14, 0.28, 0.52, 0.66, 0.8, 1.04, 1.18, 1.32].forEach((offset, index) => {
+      const oscillator = audioContext!.createOscillator();
+      const gain = audioContext!.createGain();
+      oscillator.type = index < 3 ? "square" : "sawtooth";
+      oscillator.frequency.setValueAtTime(330 * 2 ** ((index % 6) / 12), started + offset);
+      oscillator.frequency.exponentialRampToValueAtTime(
+        660 * 2 ** ((index % 6) / 12),
+        started + offset + 0.11,
+      );
+      gain.gain.setValueAtTime(0.0001, started + offset);
+      gain.gain.exponentialRampToValueAtTime(0.13, started + offset + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, started + offset + 0.12);
+      oscillator.connect(gain).connect(audioContext!.destination);
+      oscillator.start(started + offset);
+      oscillator.stop(started + offset + 0.13);
+    });
+  };
 
   const reload = async () => {
     try {
@@ -148,6 +179,26 @@ export function Signage() {
   onMount(() => {
     void reload();
     const clock = window.setInterval(() => setNow(new Date()), 1000);
+    let dismissEventAlert = 0;
+    const announced = new Set<string>();
+    const checkEventAlert = () => {
+      if (eventAlert()) return;
+      const current = Date.now();
+      const event = data().events.find((candidate) => {
+        if (candidate.allDay || announced.has(candidate.id)) return false;
+        const elapsed = current - Date.parse(candidate.startsAt);
+        return elapsed >= 0 && elapsed < 60 * 1000;
+      });
+      if (!event) return;
+      announced.add(event.id);
+      setNewsTakeover(false);
+      setScheduleTakeover(false);
+      setAttendanceTakeover(false);
+      setEventAlert(event);
+      playJackpotAlert();
+      dismissEventAlert = window.setTimeout(() => setEventAlert(null), 18 * 1000);
+    };
+    const eventAlertClock = window.setInterval(checkEventAlert, 1000);
     const refresh = window.setInterval(() => void reload(), 5 * 60 * 1000);
     let dismissNews = 0;
     const showNews = () => {
@@ -186,6 +237,7 @@ export function Signage() {
     const attendanceCycle = window.setInterval(showAttendance, 3 * 60 * 1000);
     onCleanup(() => {
       clearInterval(clock);
+      clearInterval(eventAlertClock);
       clearInterval(refresh);
       clearInterval(newsCycle);
       clearInterval(scheduleCycle);
@@ -196,6 +248,8 @@ export function Signage() {
       clearTimeout(dismissSchedule);
       clearTimeout(firstAttendance);
       clearTimeout(dismissAttendance);
+      clearTimeout(dismissEventAlert);
+      void audioContext?.close();
     });
   });
 
@@ -222,6 +276,16 @@ export function Signage() {
   return (
     <main className={`signage ${data().alerts.length ? "has-weather-alert" : ""}`}>
       <div className="scanline" aria-hidden="true" />
+
+      {!soundReady() && (
+        <button
+          className="sound-enable"
+          onClick={() => void enableSound()}
+          aria-label="予定通知音を有効にする"
+        >
+          SOUND OFF · タップで予定通知音を有効化
+        </button>
+      )}
 
       {data().alerts.length > 0 && (
         <aside className={`weather-alert ${alertLevel()}`} role="alert">
@@ -568,6 +632,22 @@ export function Signage() {
           <span>LIVE · 1秒ごとに更新</span>
         </footer>
       </section>
+
+      {eventAlert() && (
+        <section
+          className="event-alert"
+          role="alert"
+          aria-live="assertive"
+          aria-label="予定時刻です"
+        >
+          <div className="event-alert-rays" aria-hidden="true" />
+          <p className="event-alert-kicker">SCHEDULE IMPACT</p>
+          <p className="event-alert-time">{eventAlert()!.time}</p>
+          <h2>{eventAlert()!.title}</h2>
+          <p className="event-alert-location">{eventAlert()!.location || "予定の時刻です"}</p>
+          <strong>予定時刻</strong>
+        </section>
+      )}
 
       <BurnInGuard />
     </main>

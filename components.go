@@ -82,6 +82,7 @@ type WeatherAlert struct {
 type Event struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
+	StartsAt string `json:"startsAt"`
 	Time     string `json:"time"`
 	EndTime  string `json:"endTime"`
 	Day      string `json:"day"`
@@ -147,7 +148,9 @@ type SignageProps struct {
 	ScheduleTakeover    bool                   `json:"-"`
 	SchedulePage        int                    `json:"-"`
 	AttendanceTakeover  bool                   `json:"-"`
-	BurnInGuardSlot121  BurnInGuardProps       `json:"-"`
+	EventAlert          interface{}            `json:"-"`
+	SoundReady          bool                   `json:"-"`
+	BurnInGuardSlot130  BurnInGuardProps       `json:"-"`
 }
 
 // NewBurnInGuardProps creates BurnInGuardProps from BurnInGuardInput.
@@ -191,10 +194,12 @@ func NewSignageProps(in SignageInput) SignageProps {
 		ScheduleTakeover:    false,
 		SchedulePage:        0,
 		AttendanceTakeover:  false,
-		BurnInGuardSlot121: NewBurnInGuardProps(BurnInGuardInput{
-			ScopeID:  scopeID + "_s121",
+		EventAlert:          nil,
+		SoundReady:          false,
+		BurnInGuardSlot130: NewBurnInGuardProps(BurnInGuardInput{
+			ScopeID:  scopeID + "_s130",
 			BfParent: scopeID,
-			BfMount:  "s121",
+			BfMount:  "s130",
 		}),
 	}
 }

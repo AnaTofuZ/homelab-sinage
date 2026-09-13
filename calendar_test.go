@@ -28,6 +28,9 @@ func TestUpcomingCalendarEvents(t *testing.T) {
 	if events[1].Title != "朝会" || events[1].Time != "10:00" || events[1].EndTime != "10:30" || events[1].Day != "today" || events[1].Location != "オンライン" {
 		t.Errorf("unexpected recurring event: %#v", events[1])
 	}
+	if events[1].StartsAt != "2026-09-06T10:00:00+09:00" {
+		t.Errorf("StartsAt = %q, want RFC3339 start time", events[1].StartsAt)
+	}
 	if events[2].Title != "翌日の予定" || events[2].Time != "13:00" || events[2].EndTime != "14:00" || events[2].Day != "tomorrow" {
 		t.Errorf("unexpected tomorrow event: %#v", events[2])
 	}
