@@ -10,6 +10,8 @@ github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-202
 github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-20260914004114-47b659ecbb63/go.mod h1:bGI0ciIN4dXufftUHKeffVyjxUzOgf2GqZMqLFQzHOc=
 github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-20260914064529-e6d02e8aedd6 h1:dqql/qsfyUXttBwPPCyOfFXVCRr4gOjZGqZVl7k6VGw=
 github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-20260914064529-e6d02e8aedd6/go.mod h1:bGI0ciIN4dXufftUHKeffVyjxUzOgf2GqZMqLFQzHOc=
+github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-20260914134209-baa6c38b591e h1:QRoDklCaAXcMT5qow/xBV2EGww+1oOTS3Inxj7wKeTQ=
+github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-20260914134209-baa6c38b591e/go.mod h1:bGI0ciIN4dXufftUHKeffVyjxUzOgf2GqZMqLFQzHOc=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
