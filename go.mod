@@ -9,6 +9,4 @@ require (
 	golang.org/x/sync v0.23.0
 )
 
-// The BarefootJS Go runtime ships vendored under ./bf-runtime so this
-// scaffold runs without depending on a published Go module.
-replace github.com/barefootjs/runtime/bf => ./bf-runtime
+replace github.com/barefootjs/runtime/bf => github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-20260913083148-6ef65266886c
