@@ -65,7 +65,7 @@
             pname = "homelab-signage";
             version = "0.1.0";
             inherit src;
-            vendorHash = "sha256-cQtDNRQ4pbip+D/8OBrIj+xgeOg3DR3IjfU8DLcbv1w=";
+            vendorHash = "sha256-l8e2VTgSQIMwQDKbNBuRCoIl/OT2inj+Ei35f9BBVuM=";
             subPackages = [ "." ];
             nativeBuildInputs = [ pkgs.makeWrapper ];
             nativeCheckInputs = [ self.packages.${system}.golangci-lint ];
