@@ -9,4 +9,4 @@ require (
 	golang.org/x/sync v0.23.0
 )
 
-replace github.com/barefootjs/runtime/bf => github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-20260916044857-8d73c0cf8876
+replace github.com/barefootjs/runtime/bf => github.com/piconic-ai/barefootjs/packages/adapter-go-template/runtime v0.0.0-20260916063302-2ff21803dee6
