@@ -28,7 +28,7 @@ jobs:
       - name: Publish Nix build results to shared cache
         continue-on-error: true
         if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
-        uses: https://github.com/ryanccn/attic-action@5635a15ef0c5462194ffbd05d1daeddc74625c3a # v0
+        uses: https://github.com/ryanccn/attic-action@3ea5d933b47d8f9a3f008af7724f4b8b4f97f3ad # v0
         with:
           endpoint: https://nix-cache.home.anatofuz.net/
           cache: shirane
@@ -96,7 +96,7 @@ jobs:
       - name: Publish Nix build results to shared cache
         continue-on-error: true
         if: forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/master'
-        uses: https://github.com/ryanccn/attic-action@5635a15ef0c5462194ffbd05d1daeddc74625c3a # v0
+        uses: https://github.com/ryanccn/attic-action@3ea5d933b47d8f9a3f008af7724f4b8b4f97f3ad # v0
         with:
           endpoint: https://nix-cache.home.anatofuz.net/
           cache: shirane
