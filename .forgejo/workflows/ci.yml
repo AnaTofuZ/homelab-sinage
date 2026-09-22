@@ -129,5 +129,6 @@ jobs:
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
             homelab-signage-deploy@192.168.10.11
-          curl --fail --silent --show-error --max-time 10 http://192.168.10.118:8080/api/clearCache
-          curl --fail --silent --show-error --max-time 10 http://192.168.10.118:8080/api/reload
+          curl --request POST --fail --silent --show-error --max-time 10 http://192.168.10.118:8080/api/clearCache \
+            && curl --request POST --fail --silent --show-error --max-time 10 http://192.168.10.118:8080/api/reload \
+            || echo "Tab M8 is offline; skipping cache clear and reload."
