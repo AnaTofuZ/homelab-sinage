@@ -33,6 +33,7 @@ type BurnInGuardProps struct {
 	BfMount       string                 `json:"-"`
 	BfDataKey     string                 `json:"-"`
 	Scripts       *bf.ScriptCollector    `json:"-"`
+	Portals       *bf.PortalCollector    `json:"-"`
 	BfCallerProps map[string]interface{} `json:"-"`
 	Visible       bool                   `json:"-"`
 }
@@ -138,6 +139,7 @@ type SignageProps struct {
 	BfMount                 string                 `json:"-"`
 	BfDataKey               string                 `json:"-"`
 	Scripts                 *bf.ScriptCollector    `json:"-"`
+	Portals                 *bf.PortalCollector    `json:"-"`
 	BfCallerProps           map[string]interface{} `json:"-"`
 	Data                    Dashboard              `json:"-"`
 	Now                     interface{}            `json:"-"`
