@@ -20,11 +20,11 @@
     "@barefootjs/client": "^0.38.0",
     "@barefootjs/go-template": "^0.38.0",
     "@barefootjs/jsx": "^0.38.0",
-    "@barefootjs/shared": "^0.38.0"
+    "@barefootjs/shared": "^0.39.0"
   },
   "devDependencies": {
     "@barefootjs/cli": "^0.38.0",
-    "@barefootjs/vite": "^0.38.0",
+    "@barefootjs/vite": "^0.39.0",
     "@types/node": "^24.0.0",
     "concurrently": "^10.0.0",
     "oxfmt": "^0.71.0",
