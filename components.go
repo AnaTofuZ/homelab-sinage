@@ -132,31 +132,31 @@ type SignageInput struct {
 
 // SignageProps is the props type for the Signage component.
 type SignageProps struct {
-	ScopeID                 string                 `json:"-"`
-	BfIsRoot                bool                   `json:"-"`
-	BfIsChild               bool                   `json:"-"`
-	BfParent                string                 `json:"-"`
-	BfMount                 string                 `json:"-"`
-	BfDataKey               string                 `json:"-"`
-	Scripts                 *bf.ScriptCollector    `json:"-"`
-	Portals                 *bf.PortalCollector    `json:"-"`
-	BfCallerProps           map[string]interface{} `json:"-"`
-	Data                    Dashboard              `json:"-"`
-	Now                     interface{}            `json:"-"`
-	AttendanceUpdatedAt_bf0 interface{}            `json:"-"`
-	Busy                    bool                   `json:"-"`
-	NewsTakeover            bool                   `json:"-"`
-	NewsPage_bf0            int                    `json:"-"`
-	ScheduleTakeover        bool                   `json:"-"`
-	SchedulePage_bf0        int                    `json:"-"`
-	AttendanceTakeover      bool                   `json:"-"`
-	EventAlert              interface{}            `json:"-"`
-	SoundReady              bool                   `json:"-"`
-	StateLabel              string                 `json:"-"`
-	ShownWorked             bool                   `json:"-"`
-	NewsPageStart           int                    `json:"-"`
-	SchedulePageStart       int                    `json:"-"`
-	BurnInGuardSlot130      BurnInGuardProps       `json:"-"`
+	ScopeID            string                 `json:"-"`
+	BfIsRoot           bool                   `json:"-"`
+	BfIsChild          bool                   `json:"-"`
+	BfParent           string                 `json:"-"`
+	BfMount            string                 `json:"-"`
+	BfDataKey          string                 `json:"-"`
+	Scripts            *bf.ScriptCollector    `json:"-"`
+	Portals            *bf.PortalCollector    `json:"-"`
+	BfCallerProps      map[string]interface{} `json:"-"`
+	Data               Dashboard              `json:"-"`
+	Dashboard          interface{}            `json:"-"`
+	ActionName         string                 `json:"-"`
+	Now                interface{}            `json:"-"`
+	NewsTakeover       bool                   `json:"-"`
+	NewsPage           int                    `json:"-"`
+	ScheduleTakeover   bool                   `json:"-"`
+	SchedulePage       int                    `json:"-"`
+	AttendanceTakeover bool                   `json:"-"`
+	EventAlert         interface{}            `json:"-"`
+	SoundReady         bool                   `json:"-"`
+	StateLabel         string                 `json:"-"`
+	ShownWorked        int                    `json:"-"`
+	NewsPageStart      int                    `json:"-"`
+	SchedulePageStart  int                    `json:"-"`
+	BurnInGuardSlot130 BurnInGuardProps       `json:"-"`
 }
 
 // NewBurnInGuardProps creates BurnInGuardProps from BurnInGuardInput.
@@ -187,25 +187,25 @@ func NewSignageProps(in SignageInput) SignageProps {
 	bfCallerProps := map[string]interface{}{}
 
 	return SignageProps{
-		ScopeID:                 scopeID,
-		BfParent:                in.BfParent,
-		BfMount:                 in.BfMount,
-		BfCallerProps:           bfCallerProps,
-		Data:                    Dashboard{},
-		Now:                     nil,
-		AttendanceUpdatedAt_bf0: nil,
-		Busy:                    false,
-		NewsTakeover:            false,
-		NewsPage_bf0:            0,
-		ScheduleTakeover:        false,
-		SchedulePage_bf0:        0,
-		AttendanceTakeover:      false,
-		EventAlert:              nil,
-		SoundReady:              false,
-		StateLabel:              "",
-		ShownWorked:             false,
-		NewsPageStart:           0,
-		SchedulePageStart:       0,
+		ScopeID:            scopeID,
+		BfParent:           in.BfParent,
+		BfMount:            in.BfMount,
+		BfCallerProps:      bfCallerProps,
+		Data:               Dashboard{},
+		Dashboard:          nil,
+		ActionName:         "",
+		Now:                nil,
+		NewsTakeover:       false,
+		NewsPage:           0,
+		ScheduleTakeover:   false,
+		SchedulePage:       0,
+		AttendanceTakeover: false,
+		EventAlert:         nil,
+		SoundReady:         false,
+		StateLabel:         "",
+		ShownWorked:        0,
+		NewsPageStart:      0,
+		SchedulePageStart:  0,
 		BurnInGuardSlot130: NewBurnInGuardProps(BurnInGuardInput{
 			ScopeID:  scopeID + "_s130",
 			BfParent: scopeID,
