@@ -306,7 +306,6 @@ button {
 }
 .content-grid {
   height: calc(100vh - 331px);
-  min-height: 300px;
   display: grid;
   grid-template-columns: 1.3fr 0.85fr 1fr;
   gap: 10px;
@@ -314,7 +313,6 @@ button {
 }
 .has-weather-alert .content-grid {
   height: calc(100vh - 379px);
-  min-height: 252px;
 }
 .content-grid article {
   min-width: 0;
